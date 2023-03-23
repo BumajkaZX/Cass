@@ -3,6 +3,7 @@ namespace Cass.Character
     using UnityEngine;
     using UniRx;
     using System;
+    using UnityEngine.Pool;
 
     /// <summary>
     /// Character Controller
@@ -67,6 +68,14 @@ namespace Cass.Character
         [SerializeField, Range(0, 100)]
         private float _dashForce = 10f;
 
+        [SerializeField]
+        private int _dashPoolCount = default;
+
+        [SerializeField]
+        private ParticleSystem _dashParticles = default;
+
+        private ObjectPool<ParticleSystem> _dashPool = default;
+
         private Rigidbody _rb = default;
 
         private MainCharacterInput _inputActions = default;
@@ -82,6 +91,8 @@ namespace Cass.Character
         {
             _defaultScale = transform.localScale;
             _dashAvailable = _dashCount;
+
+            CreateDashPool();
 
             _inputActions = new MainCharacterInput();
             _inputActions.Main.Enable();
@@ -170,16 +181,31 @@ namespace Cass.Character
             //Dash
             Observable.EveryUpdate().Where(_ => _inputActions.Main.Dash.WasPressedThisFrame() && _dashAvailable > 0 && !IsGrounded()).Select(moveInput => _inputActions.Main.Move.ReadValue<Vector2>()).Subscribe(moveInput =>
             {
-                if (!isActiveAndEnabled)
+                if (!isActiveAndEnabled || moveInput == Vector2.zero)
                 {
                     return;
                 }
 
-                DashUse();
+                //Set particle rotation
+                _dashPool.Get(out ParticleSystem particle);
+                var lookPos = new Vector3(transform.position.x - moveInput.x, transform.position.y, transform.position.z - moveInput.y);
+                particle.transform.LookAt(lookPos);
+                ReturnParticle(particle);
 
+                DashUse();
+       
                 Vector3 dashDir = new Vector3(moveInput.x, 0, moveInput.y) * _dashForce;
                 _rb.AddForce(dashDir, ForceMode.VelocityChange);
             }).AddTo(this);
+        }
+        private void ReturnParticle(ParticleSystem particle)
+        {
+            CompositeDisposable disParticles = new CompositeDisposable();
+            Observable.Timer(TimeSpan.FromSeconds(_dashParticles.main.duration)).Subscribe(_ =>
+            {
+                _dashPool.Release(particle);
+                disParticles.Clear();
+            }).AddTo(disParticles);
         }
         private void DashUse()
         {
@@ -191,7 +217,22 @@ namespace Cass.Character
                 dis.Clear();
             }).AddTo(dis);
         }
-        private void OnDestroy() => _inputActions.Main.Disable();
+        private void CreateDashPool() =>
+                _dashPool = new ObjectPool<ParticleSystem>(() => Instantiate(_dashParticles),
+                particle => {
+                    particle.transform.position = transform.position;
+                    particle.gameObject.SetActive(true);
+                    particle.Play();
+                },
+                particle => particle.gameObject.SetActive(false),
+                null,
+                false,
+                _dashPoolCount);
+        private void OnDestroy()
+        {
+            _inputActions.Main.Disable();
+            _dashPool.Clear();
+        }
         private bool IsGrounded() => Physics.Raycast(transform.position, -Vector3.up, _distanceToGround);
 
     }
