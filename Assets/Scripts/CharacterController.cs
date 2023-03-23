@@ -8,7 +8,7 @@ namespace Cass.Character
     /// Character Controller
     /// </summary>
     [RequireComponent(typeof(Rigidbody), typeof(Collider))]
-    public class CharacterMovementController : MonoBehaviour
+    public class CharacterController : MonoBehaviour
     {
         #region params
 
@@ -183,13 +183,13 @@ namespace Cass.Character
         }
         private void DashUse()
         {
-            CompositeDisposable _dis = new CompositeDisposable();
+            CompositeDisposable dis = new CompositeDisposable();
             _dashAvailable--;
             Observable.Timer(TimeSpan.FromSeconds(_dashRechargeTime)).Subscribe(_ =>
             {
                 _dashAvailable++;
-                _dis.Clear();
-            }).AddTo(_dis);
+                dis.Clear();
+            }).AddTo(dis);
         }
         private void OnDestroy() => _inputActions.Main.Disable();
         private bool IsGrounded() => Physics.Raycast(transform.position, -Vector3.up, _distanceToGround);
