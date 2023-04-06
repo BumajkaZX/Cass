@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<objects serializationModel="Studio.02.02.00">
+	<object class="AudioFile" id="{28b40cef-b832-48b5-94a1-eb74a84c4c6d}">
+		<property name="assetPath">
+			<value>13 An Apology Note.mp3</value>
+		</property>
+		<property name="isStreaming">
+			<value>true</value>
+		</property>
+		<property name="frequencyInKHz">
+			<value>44.0999985</value>
+		</property>
+		<property name="channelCount">
+			<value>2</value>
+		</property>
+		<property name="length">
+			<value>290.58612244897961</value>
+		</property>
+		<relationship name="masterAssetFolder">
+			<destination>{b2ff41db-4a65-4bfc-9283-a883a4d97a29}</destination>
+		</relationship>
+	</object>
+</objects>
