@@ -1,7 +1,7 @@
 fileFormatVersion: 2
 guid: 925677e390ebe8444a7068123f76610c
 ModelImporter:
-  serializedVersion: 22103
+  serializedVersion: 22200
   internalIDToNameTable: []
   externalObjects: {}
   materials:
@@ -49,7 +49,7 @@ ModelImporter:
     swapUVChannels: 0
     generateSecondaryUV: 0
     useFileUnits: 1
-    keepQuads: 0
+    keepQuads: 1
     weldVertices: 1
     bakeAxisConversion: 0
     preserveHierarchy: 0
@@ -59,9 +59,9 @@ ModelImporter:
     optimizeBones: 1
     meshOptimizationFlags: -1
     indexFormat: 0
-    secondaryUVAngleDistortion: 8
-    secondaryUVAreaDistortion: 15.000001
-    secondaryUVHardAngle: 88
+    secondaryUVAngleDistortion: 75
+    secondaryUVAreaDistortion: 15
+    secondaryUVHardAngle: 180
     secondaryUVMarginMethod: 1
     secondaryUVMinLightmapResolution: 40
     secondaryUVMinObjectScale: 1
@@ -75,7 +75,7 @@ ModelImporter:
     normalCalculationMode: 4
     legacyComputeAllNormalsFromSmoothingGroupsWhenMeshHasBlendShapes: 0
     blendShapeNormalImportMode: 1
-    normalSmoothingSource: 0
+    normalSmoothingSource: 1
   referencedClips: []
   importAnimation: 1
   humanDescription:

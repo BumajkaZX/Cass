@@ -29,6 +29,9 @@ namespace Cass.Character
         [SerializeField, Range(0, 10)]
         private float _distanceToGround = 0.5f;
 
+        [SerializeField]
+        private LayerMask _groundLayers = default;
+
         [SerializeField, Range(0, 1)]
         private float _gravityUpScale = 0.5f;
 
@@ -76,14 +79,25 @@ namespace Cass.Character
         private int _dashPoolCount = default;
 
         [SerializeField]
-        private ParticleSystem _dashParticles = default;
+        private MultiParticlesPlayer _dashParticles = default;
+
+        [SerializeField]
+        private int _landPoolCount = default;
+
+        [SerializeField]
+        private MultiParticlesPlayer _landParticles = default;
 
         [Space(20)]
 
         [SerializeField]
         private StudioEventEmitter _dashSound = default;
 
-        private ObjectPool<ParticleSystem> _dashPool = default;
+        [SerializeField]
+        private StudioEventEmitter _landSound = default;
+
+        private ObjectPool<MultiParticlesPlayer> _dashPool = default;
+
+        private ObjectPool<MultiParticlesPlayer> _landPool = default;
 
         private Rigidbody _rb = default;
 
@@ -102,6 +116,8 @@ namespace Cass.Character
             _rb = GetComponent<Rigidbody>();
 
             CreateDashPool();
+
+            CreateLandPool();
         }
         private void Start()
         {
@@ -112,7 +128,12 @@ namespace Cass.Character
             _inputActions.Main.Enable();
 
             //Grounded
-            Observable.EveryUpdate().Subscribe(_ => _isGrounded = Physics.Raycast(transform.position, -Vector3.up, _distanceToGround)).AddTo(this);
+            Observable.EveryUpdate().Subscribe(_ =>
+            {
+
+                _isGrounded = Physics.Raycast(transform.position, -Vector3.up, _distanceToGround, _groundLayers); 
+
+            }).AddTo(this);
 
             //Movement
             Observable.EveryUpdate().Select(x => _inputActions.Main.Move.ReadValue<Vector2>()).Subscribe(moveInput =>
@@ -144,6 +165,12 @@ namespace Cass.Character
                 {
                     return;
                 }
+
+
+                _landPool.Get(out MultiParticlesPlayer particle);
+                ReturnParticle(particle, _landPool);
+
+                _landSound.Play();
 
                 _rb.AddForce(Vector3.up * _jumpForce, ForceMode.Acceleration);
             }).AddTo(this);
@@ -204,10 +231,10 @@ namespace Cass.Character
                 }
 
                 //Set particle rotation
-                _dashPool.Get(out ParticleSystem particle);
+                _dashPool.Get(out MultiParticlesPlayer particle);
                 var lookPos = new Vector3(transform.position.x - moveInput.x, transform.position.y, transform.position.z - moveInput.y);
                 particle.transform.LookAt(lookPos);
-                ReturnParticle(particle);
+                ReturnParticle(particle, _dashPool);
 
                 DashUse();
        
@@ -215,12 +242,12 @@ namespace Cass.Character
                 _rb.AddForce(dashDir, ForceMode.VelocityChange);
             }).AddTo(this);
         }
-        private void ReturnParticle(ParticleSystem particle)
+        private void ReturnParticle(MultiParticlesPlayer particle, ObjectPool<MultiParticlesPlayer> pool)
         {
             CompositeDisposable disParticles = new CompositeDisposable();
-            Observable.Timer(TimeSpan.FromSeconds(_dashParticles.main.duration)).Subscribe(_ =>
+            Observable.Timer(TimeSpan.FromSeconds(particle.Duration)).Subscribe(_ =>
             {
-                _dashPool.Release(particle);
+                pool.Release(particle);
                 disParticles.Clear();
             }).AddTo(disParticles);
         }
@@ -238,7 +265,7 @@ namespace Cass.Character
             }).AddTo(dis);
         }
         private void CreateDashPool() =>
-                _dashPool = new ObjectPool<ParticleSystem>(() => Instantiate(_dashParticles),
+                _dashPool = new ObjectPool<MultiParticlesPlayer>(() => Instantiate(_dashParticles),
                 particle => {
                     particle.transform.position = transform.position;
                     particle.gameObject.SetActive(true);
@@ -248,6 +275,18 @@ namespace Cass.Character
                 null,
                 false,
                 _dashPoolCount);
+        private void CreateLandPool() =>
+            _landPool = new ObjectPool<MultiParticlesPlayer>(() => Instantiate(_landParticles),
+                particle =>
+                {
+                    particle.transform.position = transform.position;
+                    particle.gameObject.SetActive(true);
+                    particle.Play();
+                },
+                particle => particle.gameObject.SetActive(false),
+                null,
+                false,
+                _landPoolCount);
         private void OnDestroy()
         {
             _inputActions.Main.Disable();

@@ -1,6 +1,6 @@
 %YAML 1.1
 %TAG !u! tag:unity3d.com,2011:
---- !u!114 &-3182436716799714296
+--- !u!114 &-6051531574446634621
 MonoBehaviour:
   m_ObjectHideFlags: 11
   m_CorrespondingSourceObject: {fileID: 0}
@@ -20,7 +20,7 @@ Material:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_Name: DashFogTrail_Mat
+  m_Name: LandParticle
   m_Shader: {fileID: -6465566751694194690, guid: d8c57525943917a428422570e14d0c16,
     type: 3}
   m_Parent: {fileID: 0}
@@ -62,7 +62,7 @@ Material:
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
     - _MainTex:
-        m_Texture: {fileID: 2800000, guid: e90d79e2f5e6a1b4d86f7a5219949330, type: 3}
+        m_Texture: {fileID: 0}
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
     - _MetallicGlossMap:
@@ -102,13 +102,13 @@ Material:
     - _BumpScale: 1
     - _ClearCoatMask: 0
     - _ClearCoatSmoothness: 0
-    - _Color: 1
+    - _Color: 0
     - _Cull: 2
     - _Cutoff: 0.5
     - _DetailAlbedoMapScale: 1
     - _DetailNormalMapScale: 1
     - _DitherStrenght: 0
-    - _DitherStrenghtColor: 2
+    - _DitherStrenghtColor: 0
     - _DstBlend: 0
     - _DstBlendAlpha: 0
     - _EnvironmentReflections: 1
@@ -132,8 +132,7 @@ Material:
     m_Colors:
     - _BaseColor: {r: 1, g: 1, b: 1, a: 1}
     - _Color: {r: 1, g: 1, b: 1, a: 1}
-    - _DefaultColor: {r: 3.9995818, g: 3.9995818, b: 3.9995818, a: 0.12941177}
     - _EmissionColor: {r: 0, g: 0, b: 0, a: 1}
-    - _GlobalResolution: {r: 213, g: 120, b: 0, a: 0}
+    - _GlobalResolution: {r: 426, g: 240, b: 0, a: 0}
     - _SpecColor: {r: 0.19999996, g: 0.19999996, b: 0.19999996, a: 1}
   m_BuildTextureStacks: []
