@@ -87,10 +87,19 @@ namespace Cass.Character
         [SerializeField]
         private MultiParticlesPlayer _landParticles = default;
 
+        [SerializeField]
+        private int _jumpPoolCount = default;
+
+        [SerializeField]
+        private MultiParticlesPlayer _jumpParticles = default;
+
         [Space(20)]
 
         [SerializeField]
         private StudioEventEmitter _dashSound = default;
+
+        [SerializeField]
+        private StudioEventEmitter _jumpSound = default;
 
         [SerializeField]
         private StudioEventEmitter _landSound = default;
@@ -98,6 +107,8 @@ namespace Cass.Character
         private ObjectPool<MultiParticlesPlayer> _dashPool = default;
 
         private ObjectPool<MultiParticlesPlayer> _landPool = default;
+
+        private ObjectPool<MultiParticlesPlayer> _jumpPool = default;
 
         private Rigidbody _rb = default;
 
@@ -115,9 +126,11 @@ namespace Cass.Character
         {
             _rb = GetComponent<Rigidbody>();
 
-            CreateDashPool();
+            CreateParticlesPool(ref _dashPool, _dashParticles, _dashPoolCount);
 
-            CreateLandPool();
+            CreateParticlesPool(ref _landPool, _landParticles, _landPoolCount);
+
+            CreateParticlesPool(ref _jumpPool, _jumpParticles, _jumpPoolCount);
         }
         private void Start()
         {
@@ -128,10 +141,19 @@ namespace Cass.Character
             _inputActions.Main.Enable();
 
             //Grounded
-            Observable.EveryUpdate().Subscribe(_ =>
+            Observable.EveryFixedUpdate().Subscribe(_ =>
             {
+                bool currentGrounded = _isGrounded;
 
-                _isGrounded = Physics.Raycast(transform.position, -Vector3.up, _distanceToGround, _groundLayers); 
+                _isGrounded = Physics.Raycast(transform.position, -Vector3.up, _distanceToGround, _groundLayers);
+
+                if (!currentGrounded && _isGrounded)
+                {
+                    _landPool.Get(out MultiParticlesPlayer particle);
+                    ReturnParticle(particle, _landPool);
+
+                    _landSound.Play();
+                }
 
             }).AddTo(this);
 
@@ -167,10 +189,10 @@ namespace Cass.Character
                 }
 
 
-                _landPool.Get(out MultiParticlesPlayer particle);
-                ReturnParticle(particle, _landPool);
+                _jumpPool.Get(out MultiParticlesPlayer particle);
+                ReturnParticle(particle, _jumpPool);
 
-                _landSound.Play();
+                _jumpSound.Play();
 
                 _rb.AddForce(Vector3.up * _jumpForce, ForceMode.Acceleration);
             }).AddTo(this);
@@ -264,19 +286,8 @@ namespace Cass.Character
                 dis.Clear();
             }).AddTo(dis);
         }
-        private void CreateDashPool() =>
-                _dashPool = new ObjectPool<MultiParticlesPlayer>(() => Instantiate(_dashParticles),
-                particle => {
-                    particle.transform.position = transform.position;
-                    particle.gameObject.SetActive(true);
-                    particle.Play();
-                },
-                particle => particle.gameObject.SetActive(false),
-                null,
-                false,
-                _dashPoolCount);
-        private void CreateLandPool() =>
-            _landPool = new ObjectPool<MultiParticlesPlayer>(() => Instantiate(_landParticles),
+        private void CreateParticlesPool(ref ObjectPool<MultiParticlesPlayer> pool, MultiParticlesPlayer particlePrefab, int poolCount) =>
+             pool = new ObjectPool<MultiParticlesPlayer>(() => Instantiate(particlePrefab),
                 particle =>
                 {
                     particle.transform.position = transform.position;
@@ -286,11 +297,13 @@ namespace Cass.Character
                 particle => particle.gameObject.SetActive(false),
                 null,
                 false,
-                _landPoolCount);
+                poolCount);
         private void OnDestroy()
         {
             _inputActions.Main.Disable();
             _dashPool.Clear();
+            _jumpPool.Clear();
+            _landPool.Clear();
         }
     }
 }

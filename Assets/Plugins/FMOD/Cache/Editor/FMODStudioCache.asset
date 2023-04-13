@@ -27,6 +27,33 @@ MonoBehaviour:
   MinDistance: 1
   MaxDistance: 20
   Length: 100
+--- !u!114 &-7022686624763698219
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ceb653cd98e289a4e8697a1af55201f2, type: 3}
+  m_Name: event:/Character/Land
+  m_EditorClassIdentifier: 
+  Path: event:/Character/Land
+  Guid:
+    Data1: -1617420500
+    Data2: 1272633981
+    Data3: 2104067234
+    Data4: -107281739
+  Banks:
+  - {fileID: -3078487235314803080}
+  IsStream: 1
+  Is3D: 0
+  IsOneShot: 1
+  Parameters: []
+  MinDistance: 1
+  MaxDistance: 20
+  Length: 100
 --- !u!114 &-6253684778394741553
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -42,10 +69,10 @@ MonoBehaviour:
   Path: FMOD/CassSound/Build/Desktop/Master.strings.bank
   Name: Master.strings
   StudioPath: bank:/Master.strings
-  lastModified: 638169126752432589
+  lastModified: 638169858708845788
   FileSizes:
   - Name: Desktop
-    Value: 814
+    Value: 846
   Exists: 1
 --- !u!114 &-5084161653966830559
 MonoBehaviour:
@@ -80,38 +107,11 @@ MonoBehaviour:
   Path: FMOD/CassSound/Build/Desktop/Master.bank
   Name: Master
   StudioPath: bank:/Master
-  lastModified: 638169126752422833
+  lastModified: 638169858708815758
   FileSizes:
   - Name: Desktop
-    Value: 3879424
+    Value: 3880512
   Exists: 1
---- !u!114 &-1192794495659951978
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 0}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: ceb653cd98e289a4e8697a1af55201f2, type: 3}
-  m_Name: event:/Character/LandJump
-  m_EditorClassIdentifier: 
-  Path: event:/Character/LandJump
-  Guid:
-    Data1: -1138841630
-    Data2: 1202177597
-    Data3: -1383916370
-    Data4: 587009542
-  Banks:
-  - {fileID: -3078487235314803080}
-  IsStream: 1
-  Is3D: 0
-  IsOneShot: 1
-  Parameters: []
-  MinDistance: 1
-  MaxDistance: 20
-  Length: 300
 --- !u!114 &-668105740179831818
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -156,13 +156,14 @@ MonoBehaviour:
   - {fileID: -3078487235314803080}
   EditorEvents:
   - {fileID: -7889861288798189973}
-  - {fileID: -1192794495659951978}
+  - {fileID: -7022686624763698219}
+  - {fileID: 7539302281080921043}
   EditorParameters: []
   MasterBanks:
   - {fileID: -3078487235314803080}
   StringsBanks:
   - {fileID: -6253684778394741553}
-  cacheTime: 638169126752432589
+  cacheTime: 638169858708845788
   cacheVersion: 131601
 --- !u!114 &3360246104769813798
 MonoBehaviour:
@@ -184,3 +185,30 @@ MonoBehaviour:
   - Name: 
     Value: 764
   Exists: 1
+--- !u!114 &7539302281080921043
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ceb653cd98e289a4e8697a1af55201f2, type: 3}
+  m_Name: event:/Character/Jump
+  m_EditorClassIdentifier: 
+  Path: event:/Character/Jump
+  Guid:
+    Data1: -1138841630
+    Data2: 1202177597
+    Data3: -1383916370
+    Data4: 587009542
+  Banks:
+  - {fileID: -3078487235314803080}
+  IsStream: 1
+  Is3D: 0
+  IsOneShot: 1
+  Parameters: []
+  MinDistance: 1
+  MaxDistance: 20
+  Length: 300
