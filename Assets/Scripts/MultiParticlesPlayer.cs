@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using UnityEngine;
+using NaughtyAttributes;
 
 /// <summary>
 /// Playing multiple particles
@@ -21,6 +22,7 @@ public class MultiParticlesPlayer : MonoBehaviour
     /// Start :3
     /// </summary>
     [ContextMenu("Play")]
+    [Button("Play")]
     public void Play()
     {
         foreach(ParticleSystem particle in _particles)

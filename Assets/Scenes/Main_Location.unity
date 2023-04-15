@@ -201,7 +201,7 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 80805556}
-  m_LocalRotation: {x: 0.3899455, y: -0.000007991434, z: 0.0000033841175, w: 0.92083794}
+  m_LocalRotation: {x: 0.38994554, y: -0.000007991434, z: 0.000003384118, w: 0.92083794}
   m_LocalPosition: {x: 1.23238, y: 2.3607001, z: -1.2890999}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 1
@@ -1134,7 +1134,7 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 544684858}
-  m_LocalRotation: {x: 0.3899455, y: -0.000007991434, z: 0.0000033841175, w: 0.92083794}
+  m_LocalRotation: {x: 0.38994554, y: -0.000007991434, z: 0.000003384118, w: 0.92083794}
   m_LocalPosition: {x: 1.23238, y: 2.3607001, z: -1.2890999}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 1
@@ -2017,8 +2017,8 @@ MonoBehaviour:
   _scaleDown: {x: 0.95, y: 1.07, z: 0.95}
   _scaleUp: {x: 1.07, y: 0.95, z: 1.07}
   "_scale\u0421oefficient": 1.5
-  _slidePower: 1.65
-  _dashCount: 10
+  _slidePower: 1.17
+  _dashCount: 4
   _dashRechargeTime: 3
   _dashForce: 5
   _dashUp: 0.4

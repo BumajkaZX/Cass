@@ -20,6 +20,8 @@ namespace Cass.Character
 
         private const float SCALE_TO_LOCAL = 10f;
 
+        public ReactiveProperty<int> DashAvailableCount => _dashAvailable;
+
         [SerializeField, Range(0, 10)]
         private float _moveSpeed = 1f;
 
@@ -116,7 +118,7 @@ namespace Cass.Character
 
         private Vector3 _defaultScale = default;
 
-        private int _dashAvailable = default;
+        private ReactiveProperty<int> _dashAvailable = new ReactiveProperty<int>();
 
         private bool _isGrounded = true;
 
@@ -135,7 +137,7 @@ namespace Cass.Character
         private void Start()
         {
             _defaultScale = transform.localScale;
-            _dashAvailable = _dashCount;
+            _dashAvailable.Value = _dashCount;
 
             _inputActions = new MainCharacterInput();
             _inputActions.Main.Enable();
@@ -245,7 +247,7 @@ namespace Cass.Character
             }).AddTo(this);
 
             //Dash
-            Observable.EveryUpdate().Where(_ => _inputActions.Main.Dash.WasPressedThisFrame() && _dashAvailable > 0 && !_isGrounded).Select(moveInput => _inputActions.Main.Move.ReadValue<Vector2>()).Subscribe(moveInput =>
+            Observable.EveryUpdate().Where(_ => _inputActions.Main.Dash.WasPressedThisFrame() && _dashAvailable.Value > 0 && !_isGrounded).Select(moveInput => _inputActions.Main.Move.ReadValue<Vector2>()).Subscribe(moveInput =>
             {
                 if (!isActiveAndEnabled || moveInput == Vector2.zero)
                 {
@@ -276,13 +278,13 @@ namespace Cass.Character
         private void DashUse()
         {
             CompositeDisposable dis = new CompositeDisposable();
-            _dashAvailable--;
+            _dashAvailable.Value--;
 
             _dashSound.Play();
 
             Observable.Timer(TimeSpan.FromSeconds(_dashRechargeTime)).Subscribe(_ =>
             {
-                _dashAvailable++;
+                _dashAvailable.Value++;
                 dis.Clear();
             }).AddTo(dis);
         }
