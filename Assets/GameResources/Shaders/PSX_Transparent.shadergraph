@@ -630,7 +630,7 @@
                 "m_Node": {
                     "m_Id": "a44158977f624010a15081027b4d9533"
                 },
-                "m_SlotId": 5
+                "m_SlotId": 7
             },
             "m_InputSlot": {
                 "m_Node": {
@@ -925,8 +925,8 @@
     },
     "m_FragmentContext": {
         "m_Position": {
-            "x": 314.0000305175781,
-            "y": 199.00001525878907
+            "x": 312.0000305175781,
+            "y": 198.99996948242188
         },
         "m_Blocks": [
             {
@@ -2173,7 +2173,7 @@
     "m_Hidden": false,
     "m_ShaderOutputName": "Occlusion",
     "m_StageCapability": 2,
-    "m_Value": 0.0,
+    "m_Value": 1.0,
     "m_DefaultValue": 1.0,
     "m_Labels": []
 }
@@ -2230,8 +2230,8 @@
     "m_SurfaceType": 1,
     "m_ZTestMode": 4,
     "m_ZWriteControl": 0,
-    "m_AlphaMode": 3,
-    "m_RenderFace": 2,
+    "m_AlphaMode": 0,
+    "m_RenderFace": 0,
     "m_AlphaClip": false,
     "m_CastShadows": true,
     "m_ReceiveShadows": true,
@@ -2528,7 +2528,7 @@
     "m_Hidden": false,
     "m_ShaderOutputName": "Alpha",
     "m_StageCapability": 2,
-    "m_Value": 1.0,
+    "m_Value": 0.0,
     "m_DefaultValue": 1.0,
     "m_Labels": []
 }
