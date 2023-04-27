@@ -147,7 +147,7 @@ namespace Cass.Character
             {
                 bool currentGrounded = _isGrounded;
 
-                _isGrounded = Physics.Raycast(transform.position, -Vector3.up, _distanceToGround, _groundLayers);
+                _isGrounded = Physics.Raycast(transform.position, -Vector3.up, _distanceToGround, _groundLayers, QueryTriggerInteraction.Ignore);
 
                 if (!currentGrounded && _isGrounded)
                 {

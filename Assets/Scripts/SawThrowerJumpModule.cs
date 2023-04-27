@@ -27,7 +27,6 @@ public class SawThrowerJumpModule : MonoBehaviour
                 return;
             }
 
-            Debug.LogError("Jump");
             _rb.AddForce(Vector3.up * _jumpPower * _rb.mass, ForceMode.Impulse); 
         }).AddTo(this);
     }
