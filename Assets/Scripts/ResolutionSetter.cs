@@ -3,7 +3,7 @@ using UnityEngine;
 /// <summary>
 /// Set resolution on awake
 /// </summary>
-public class ResolutionSetter
+public class ResolutionSetter : MonoBehaviour
 {
     private const int HEIGHT = 240;
 
@@ -23,4 +23,13 @@ public class ResolutionSetter
 #endif
 
     }
+
+    private void OnApplicationFocus(bool focus)
+    {
+        if (focus)
+        {
+            SetResolution();
+        }
+    }
+
 }

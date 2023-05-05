@@ -5,12 +5,13 @@ namespace Cass.Character
     using System;
     using UnityEngine.Pool;
     using FMODUnity;
+    using Unity.Netcode;
 
     /// <summary>
     /// Character Controller
     /// </summary>
     [RequireComponent(typeof(Rigidbody), typeof(Collider))]
-    public class MainCharacterController : MonoBehaviour
+    public class MainCharacterController : NetworkBehaviour
     {
         #region params
 
@@ -21,6 +22,14 @@ namespace Cass.Character
         private const float SCALE_TO_LOCAL = 10f;
 
         public ReactiveProperty<int> DashAvailableCount => _dashAvailable;
+
+        [SerializeField]
+        private bool _jumpEnable = false;
+
+        [SerializeField]
+        private bool _dashEnable = false;
+
+        [Space(20)]
 
         [SerializeField, Range(0, 10)]
         private float _moveSpeed = 1f;
@@ -120,19 +129,35 @@ namespace Cass.Character
 
         private ReactiveProperty<int> _dashAvailable = new ReactiveProperty<int>();
 
+        private CompositeDisposable _disposables = new CompositeDisposable();
+
         private bool _isGrounded = true;
 
         #endregion
+
+        public override void OnNetworkSpawn()
+        {
+            if (!IsOwner)
+            {
+                Destroy(this);
+            }
+        }
 
         private void Awake()
         {
             _rb = GetComponent<Rigidbody>();
 
-            CreateParticlesPool(ref _dashPool, _dashParticles, _dashPoolCount);
+            if (_dashEnable)
+            {
+                CreateParticlesPool(ref _dashPool, _dashParticles, _dashPoolCount);
+            }
 
             CreateParticlesPool(ref _landPool, _landParticles, _landPoolCount);
 
-            CreateParticlesPool(ref _jumpPool, _jumpParticles, _jumpPoolCount);
+            if (_jumpEnable)
+            {
+                CreateParticlesPool(ref _jumpPool, _jumpParticles, _jumpPoolCount);
+            }
         }
         private void Start()
         {
@@ -157,7 +182,7 @@ namespace Cass.Character
                     _landSound.Play();
                 }
 
-            }).AddTo(this);
+            }).AddTo(_disposables);
 
             //Movement
             Observable.EveryUpdate().Select(x => _inputActions.Main.Move.ReadValue<Vector2>()).Subscribe(moveInput =>
@@ -180,24 +205,27 @@ namespace Cass.Character
 
                 Vector3 move = new Vector3(moveInput.x, 0, moveInput.y);
                 _rb.AddForce(_moveSpeed * MOVE_MULTIPLY * Time.deltaTime * move, ForceMode.VelocityChange);
-            }).AddTo(this);
+            }).AddTo(_disposables);
 
-            //Jump
-            Observable.EveryUpdate().Where(_ => _inputActions.Main.Jump.WasPressedThisFrame()).Subscribe(_ =>
+            if (_jumpEnable)
             {
-                if (!isActiveAndEnabled || !_isGrounded)
+                //Jump
+                Observable.EveryUpdate().Where(_ => _inputActions.Main.Jump.WasPressedThisFrame()).Subscribe(_ =>
                 {
-                    return;
-                }
+                    if (!isActiveAndEnabled || !_isGrounded)
+                    {
+                        return;
+                    }
 
 
-                _jumpPool.Get(out MultiParticlesPlayer particle);
-                ReturnParticle(particle, _jumpPool);
+                    _jumpPool.Get(out MultiParticlesPlayer particle);
+                    ReturnParticle(particle, _jumpPool);
 
-                _jumpSound.Play();
+                    _jumpSound.Play();
 
-                _rb.AddForce(Vector3.up * _jumpForce, ForceMode.Acceleration);
-            }).AddTo(this);
+                    _rb.AddForce(Vector3.up * _jumpForce, ForceMode.Acceleration);
+                }).AddTo(_disposables);
+            }
 
             //Scale control
             if (_springTransform != null)
@@ -221,7 +249,7 @@ namespace Cass.Character
                         newScale = Vector3.LerpUnclamped(_defaultScale, _scaleUp * _defaultScale.x, interpolator);
                     }
                     transform.localScale = newScale;
-                }).AddTo(this);
+                }).AddTo(_disposables);
             }
 
             //Custom gravity
@@ -244,27 +272,30 @@ namespace Cass.Character
                 }
 
                 _rb.AddForce(-Vector3.up * gravity, ForceMode.Acceleration);
-            }).AddTo(this);
+            }).AddTo(_disposables);
 
-            //Dash
-            Observable.EveryUpdate().Where(_ => _inputActions.Main.Dash.WasPressedThisFrame() && _dashAvailable.Value > 0 && !_isGrounded).Select(moveInput => _inputActions.Main.Move.ReadValue<Vector2>()).Subscribe(moveInput =>
+            if (_dashEnable)
             {
-                if (!isActiveAndEnabled || moveInput == Vector2.zero)
+                //Dash
+                Observable.EveryUpdate().Where(_ => _inputActions.Main.Dash.WasPressedThisFrame() && _dashAvailable.Value > 0 && !_isGrounded).Select(moveInput => _inputActions.Main.Move.ReadValue<Vector2>()).Subscribe(moveInput =>
                 {
-                    return;
-                }
+                    if (!isActiveAndEnabled || moveInput == Vector2.zero)
+                    {
+                        return;
+                    }
 
                 //Set particle rotation
                 _dashPool.Get(out MultiParticlesPlayer particle);
-                var lookPos = new Vector3(transform.position.x - moveInput.x, transform.position.y, transform.position.z - moveInput.y);
-                particle.transform.LookAt(lookPos);
-                ReturnParticle(particle, _dashPool);
+                    var lookPos = new Vector3(transform.position.x - moveInput.x, transform.position.y, transform.position.z - moveInput.y);
+                    particle.transform.LookAt(lookPos);
+                    ReturnParticle(particle, _dashPool);
 
-                DashUse();
-       
-                Vector3 dashDir = new Vector3(moveInput.x, _dashUp, moveInput.y) * _dashForce;
-                _rb.AddForce(dashDir, ForceMode.VelocityChange);
-            }).AddTo(this);
+                    DashUse();
+
+                    Vector3 dashDir = new Vector3(moveInput.x, _dashUp, moveInput.y) * _dashForce;
+                    _rb.AddForce(dashDir, ForceMode.VelocityChange);
+                }).AddTo(_disposables);
+            }
         }
         private void ReturnParticle(MultiParticlesPlayer particle, ObjectPool<MultiParticlesPlayer> pool)
         {
@@ -302,10 +333,26 @@ namespace Cass.Character
                 poolCount);
         private void OnDestroy()
         {
+            if (!IsOwner)
+            {
+                return;
+            }
+
             _inputActions.Main.Disable();
-            _dashPool.Clear();
-            _jumpPool.Clear();
+
+            if (_dashEnable)
+            {
+                _dashPool.Clear();
+            }
+
+            if (_jumpEnable)
+            {
+                _jumpPool.Clear();
+            }
+
             _landPool.Clear();
+
+            _disposables.Clear();
         }
     }
 }
