@@ -4,6 +4,7 @@ namespace Cass.UI.Lobbies
     using Unity.Services.Lobbies.Models;
     using UnityEngine;
     using UniRx;
+    using System;
 
     [RequireComponent(typeof(RectTransform))]
     public class LobbiesSpawner : MonoBehaviour
@@ -17,6 +18,8 @@ namespace Cass.UI.Lobbies
         private RectTransform _rectTransform = default;
 
         private List<Lobby> _lobbiesList = new List<Lobby>();
+
+        private Action<bool> onConnectError = delegate { };
 
         private void Awake()=> 
             _lobbyManager.IsInited.Subscribe(Inited =>
@@ -42,7 +45,7 @@ namespace Cass.UI.Lobbies
         {
             if (lobbyCode != null)
             {
-                _lobbyManager.TryConnectToLobby(lobbyCode);
+                _lobbyManager.TryConnectToLobby(onConnectError, lobbyCode);
             }
         }).AddTo(this);
 

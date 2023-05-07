@@ -125,7 +125,7 @@ public class LobbyManager : MonoBehaviour
     {
         try
         {
-            if (ConnectedLobby.Value.HostId == _playerId)
+            if (ConnectedLobby.Value != null && ConnectedLobby.Value.HostId == _playerId)
             {
                 await Lobbies.Instance.RemovePlayerAsync(ConnectedLobby.Value.Id, _playerId);
             }
@@ -153,7 +153,7 @@ public class LobbyManager : MonoBehaviour
     {
         try
         {
-            if (ConnectedLobby.Value.HostId == _playerId)
+            if (ConnectedLobby.Value != null && ConnectedLobby.Value.HostId == _playerId)
             {
                 await Lobbies.Instance.DeleteLobbyAsync(ConnectedLobby.Value.Id);
             }
@@ -223,18 +223,19 @@ public class LobbyManager : MonoBehaviour
     /// Connect to lobby
     /// </summary>
     /// <param name="lobbyId"></param>
-    public async void TryConnectToLobby(string lobbyId = null)
+    public async void TryConnectToLobby(Action<bool> onConnectError, string lobbyId = null)
     {
         Lobby lobby = await QuickJoinLobby(lobbyId);
         if(lobby == null)
         {
             Debug.LogError("Can't connect to lobby");
             ForceUpdateLobbiesList();
+            onConnectError.Invoke(true);
             return;
         }
 
         Debug.LogError("Connect to lobby");
-
+        onConnectError.Invoke(false);
         ConnectedLobby.Value = lobby;
     }
     /// <summary>
