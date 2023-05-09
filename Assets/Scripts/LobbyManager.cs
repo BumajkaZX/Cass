@@ -32,12 +32,6 @@ public class LobbyManager : MonoBehaviour
     [SerializeField, Range(2, 10)]
     private int _maxPlayers = 2;
 
-    [SerializeField, Range(1, 100)]
-    private int _maxLobbies = 10;
-
-    [SerializeField, Range(1, 10)]
-    private float _lobbiesUpdateTime = 5;
-
     [SerializeField]
     private TMPro.TMP_Text _text = default;
 
@@ -53,22 +47,16 @@ public class LobbyManager : MonoBehaviour
     {
         await Authenticate();
 
-        LobbiesList.Value = await GetLobbiesList();
-
-        UpdateLobbiesList();
-
         IsInited.Value = true;
     }
 
-    private void UpdateLobbiesList() => Observable.Timer(TimeSpan.FromSeconds(_lobbiesUpdateTime)).Repeat().Subscribe(_ => ForceUpdateLobbiesList()).AddTo(this);
-
-    private async Task<QueryResponse> GetLobbiesList()
+    private async Task<QueryResponse> GetLobbiesList(int lobbiesCount)
     {
         try
         {
             QueryLobbiesOptions options = new QueryLobbiesOptions();
 
-            options.Count = _maxLobbies;
+            options.Count = lobbiesCount;
 
             options.Filters = new List<QueryFilter>()
             {
@@ -214,11 +202,7 @@ public class LobbyManager : MonoBehaviour
             Debug.LogWarning($"Something happend with {gameObject.name} - {ex.Message}");
         }
     }
-    /// <summary>
-    /// Max Lobbies
-    /// </summary>
-    /// <returns></returns>
-    public int GetMaxLobbies() => _maxLobbies;
+
     /// <summary>
     /// Connect to lobby
     /// </summary>
@@ -229,7 +213,6 @@ public class LobbyManager : MonoBehaviour
         if(lobby == null)
         {
             Debug.LogError("Can't connect to lobby");
-            ForceUpdateLobbiesList();
             onConnectError.Invoke(true);
             return;
         }
@@ -260,5 +243,5 @@ public class LobbyManager : MonoBehaviour
     /// <summary>
     /// Force update lobbies list
     /// </summary>
-    public async void ForceUpdateLobbiesList() => LobbiesList.Value = await GetLobbiesList();
+    public async void ForceUpdateLobbiesList(int lobbiesCount) => LobbiesList.Value = await GetLobbiesList(lobbiesCount);
 }

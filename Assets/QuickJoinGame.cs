@@ -34,7 +34,7 @@ namespace Cass.UI.Lobbies
             {
                 _button.interactable = true;
             }
-            Debug.LogError("ERROR");
+            Debug.LogError("CONNECTION ERROR");
         }
     }
 }

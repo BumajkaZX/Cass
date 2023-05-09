@@ -3560,8 +3560,6 @@ MonoBehaviour:
   IsInited:
     value: 0
   _maxPlayers: 2
-  _maxLobbies: 10
-  _lobbiesUpdateTime: 5
   _text: {fileID: 1274713818}
 --- !u!1001 &1359434139
 PrefabInstance:
@@ -11397,6 +11395,8 @@ MonoBehaviour:
   _lobbyManager: {fileID: 1330423003}
   _lobbyPrefab: {fileID: -2250661634019753655, guid: 05eb4d700a2e91e4b85910f6f66f3fbe,
     type: 3}
+  _lobbiesUpdateTime: 5
+  _lobbiesCount: 10
 --- !u!114 &2109675356
 MonoBehaviour:
   m_ObjectHideFlags: 0

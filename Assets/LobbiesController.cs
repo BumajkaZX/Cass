@@ -7,13 +7,19 @@ namespace Cass.UI.Lobbies
     using System;
 
     [RequireComponent(typeof(RectTransform))]
-    public class LobbiesSpawner : MonoBehaviour
+    public class LobbiesController : MonoBehaviour
     {
         [SerializeField]
         private LobbyManager _lobbyManager = default;
 
         [SerializeField]
         private Lobby _lobbyPrefab = default;
+
+        [SerializeField, Range(1, 10)]
+        private float _lobbiesUpdateTime = 5;
+
+        [SerializeField, Min(10)]
+        private int _lobbiesCount = 10;
 
         private RectTransform _rectTransform = default;
 
@@ -39,8 +45,13 @@ namespace Cass.UI.Lobbies
             _lobbyManager.LobbiesList.Subscribe(lobbies => UpdateLobbies(lobbies)).AddTo(this);
 
             ObserveConnectToLobbies();
+
+            UpdateLobbiesList();
+
+            _rectTransform.anchoredPosition = new Vector2(_rectTransform.anchoredPosition.x, -(_rectTransform.sizeDelta.y / 2));
         }
-        
+        private void UpdateLobbiesList() => Observable.Timer(TimeSpan.FromSeconds(_lobbiesUpdateTime)).Repeat().Subscribe(_ => _lobbyManager.ForceUpdateLobbiesList(_lobbiesCount)).AddTo(this);
+
         private void ObserveConnectToLobbies() => Lobby.JoinId.Subscribe(lobbyCode =>
         {
             if (lobbyCode != null)
@@ -51,9 +62,8 @@ namespace Cass.UI.Lobbies
 
         private void CreateLobbies()
         {
-            int maxLobbies = _lobbyManager.GetMaxLobbies();
 
-            for (int i = 0; i < maxLobbies; i++)
+            for (int i = 0; i < _lobbiesCount; i++)
             {
                 Lobby lobby = Instantiate(_lobbyPrefab, _rectTransform);
                 lobby.gameObject.SetActive(false);
@@ -100,10 +110,7 @@ namespace Cass.UI.Lobbies
                     lobby.SetLobbyId(lobbies.Results[i].Id);
                     lobby.gameObject.SetActive(true);
                 }
-                Debug.LogError(lobbies.Results[i].IsPrivate + " " + lobbies.Results[i].Id);
             }
-
-            _rectTransform.anchoredPosition = new Vector2(_rectTransform.anchoredPosition.x, -(_rectTransform.sizeDelta.y / 2));
         }
     }
 }

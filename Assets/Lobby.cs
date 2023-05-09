@@ -1,6 +1,5 @@
 namespace Cass.UI.Lobbies
 {
-    using System;
     using TMPro;
     using UnityEngine;
     using UnityEngine.UI;
@@ -25,11 +24,7 @@ namespace Cass.UI.Lobbies
         [SerializeField]
         private string _lobbyId = default;
 
-        private void Awake() => _joinButton.OnClickAsObservable().Subscribe(_ =>
-        {
-            Debug.LogError("Click");
-            JoinId.SetValueAndForceNotify(_lobbyId);
-        }).AddTo(this);
+        private void Awake() => _joinButton.OnClickAsObservable().Subscribe(_ => JoinId.SetValueAndForceNotify(_lobbyId)).AddTo(this);
         /// <summary>
         /// Set lobby name
         /// </summary>
