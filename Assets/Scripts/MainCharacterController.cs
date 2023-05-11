@@ -331,8 +331,10 @@ namespace Cass.Character
                 null,
                 false,
                 poolCount);
-        private void OnDestroy()
+        public override void OnDestroy()
         {
+            base.OnDestroy();
+
             if (!IsOwner)
             {
                 return;

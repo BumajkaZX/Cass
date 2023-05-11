@@ -16,7 +16,7 @@ namespace Cass.EditorTools
             {
                 string path = SceneUtility.GetScenePathByBuildIndex(i);
                 string sceneName = System.IO.Path.GetFileNameWithoutExtension(path);
-                GUILayout.BeginHorizontal();
+                EditorGUILayout.BeginHorizontal();
                 EditorGUILayout.LabelField(sceneName, GUILayout.MaxWidth(120));
                 bool isOpenScene = EditorSceneManager.GetSceneByName(sceneName).name != null;
                 if (EditorSceneManager.GetActiveScene().name == sceneName && EditorSceneManager.sceneCount == 1)
@@ -58,7 +58,7 @@ namespace Cass.EditorTools
 
                 }
 
-                GUILayout.EndHorizontal();
+                EditorGUILayout.EndHorizontal();
 
                 GUILayout.Space(5);
 
