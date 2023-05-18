@@ -1,81 +1,88 @@
-using System;
-using UnityEngine;
-using UniRx;
-using System.Threading.Tasks;
-using System.Threading;
-using Cass.LoadManager;
-
-public class ConnectionManager : MonoBehaviour, ILoadingCondition
+namespace Cass.Services
 {
-    public static ConnectionManager Instance = default;
 
-    public int Order => _order;
-    
+    using System;
+    using UnityEngine;
+    using UniRx;
+    using System.Threading.Tasks;
+    using System.Threading;
+    using Cass.LoadManager;
 
-    public string Name => typeof(ConnectionManager).Name;
-
-    public bool IsInited => _isInited;
-
-    [HideInInspector]
-    public ReactiveProperty<bool> IsConnected = new ReactiveProperty<bool>(false);
-
-    [SerializeField, Min(1)]
-    private int _pingTimeInSeconds = 5;
-
-    [SerializeField, Min(0)]
-    private int _order = 1;
-
-    private bool _isInited = false;
-
-    public async Task<Action> Initialization(CancellationToken token)
+    public class ConnectionManager : MonoBehaviour, ILoadingCondition
     {
-        if (Instance != null)
+        public static ConnectionManager Instance = default;
+
+        public int Order => _order;
+
+        public string Name => typeof(ConnectionManager).Name;
+
+        public bool IsInited => _isInited;
+
+        [HideInInspector]
+        public ReactiveProperty<bool> IsConnected = new ReactiveProperty<bool>(false);
+
+        [SerializeField, Min(1)]
+        private int _pingTimeInSeconds = 5;
+
+        [SerializeField, Min(0)]
+        private int _order = 1;
+
+        private bool _isInited = false;
+
+        public async Task<Action> Initialization(CancellationToken token)
         {
-            Destroy(this);
-            await Task.CompletedTask;
-            return null;
-        }
-        else
-        {
-            Instance = this;
-            DontDestroyOnLoad(gameObject);
-        }
+            Action act = null;
+            if (Instance != null)
+            {
+                Destroy(this);
+                return act;
+            }
+            else
+            {
+                Instance = this;
+                DontDestroyOnLoad(gameObject);
+            }
 
 #if UNITY_EDITOR
 
-        IsConnected.Value = true;
+            IsConnected.Value = true;
 
 #else
       
-        ConnectionObserver();
+            ConnectionObserver();
 
 #endif
 
-        while (!IsConnected.Value)
-        {
-            await Task.Yield();
+            while (!IsConnected.Value)
+            {
+                if (token.IsCancellationRequested)
+                {
+                    return act;
+                }
+                await Task.Yield();
+            }
+
+            _isInited = true;
+
+
+            Debug.LogError("Connected");
+
+            return act;
         }
 
-        _isInited = true;
+        private void ConnectionObserver() =>
+            Observable.Timer(TimeSpan.FromSeconds(_pingTimeInSeconds)).Repeat().Subscribe(_ =>
+                {
 
-   
-        Debug.LogError("Connected");
-
-        return null;
+                    if (Application.internetReachability != NetworkReachability.ReachableViaCarrierDataNetwork && IsConnected.Value)
+                    {
+                        IsConnected.Value = false;
+                        Cass.Logger.Logger.Instance.Log("No connection");
+                    }
+                    else if (Application.internetReachability == NetworkReachability.ReachableViaCarrierDataNetwork && !IsConnected.Value)
+                    {
+                        IsConnected.Value = true;
+                    }
+                }).AddTo(this);
     }
-
-    private void ConnectionObserver() => 
-        Observable.Timer(TimeSpan.FromSeconds(_pingTimeInSeconds)).Repeat().Subscribe(_ =>
-            {
-                
-                if (Application.internetReachability != NetworkReachability.ReachableViaCarrierDataNetwork && IsConnected.Value)
-                {
-                    IsConnected.Value = false;
-                    Logger.Instance.Log("No connection");
-                }
-                else if (Application.internetReachability == NetworkReachability.ReachableViaCarrierDataNetwork && !IsConnected.Value)
-                {
-                    IsConnected.Value = true;
-                }
-            }).AddTo(this);
 }

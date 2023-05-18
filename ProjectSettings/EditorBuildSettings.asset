@@ -15,7 +15,7 @@ EditorBuildSettings:
     path: Assets/Scenes/Main Location.unity
     guid: 11ed01568da0fd344a050bb542f3983d
   - enabled: 1
-    path: Assets/Scenes/FirstTutorScene.unity
+    path: Assets/Scenes/Tutor.unity
     guid: 866df326f605b974b95d1f731538f06f
   m_configObjects:
     com.unity.addressableassets: {fileID: 11400000, guid: 027b7e0c71a78f942a3f3800d7ebbd7f,

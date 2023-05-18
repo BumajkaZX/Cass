@@ -18,9 +18,8 @@ namespace Cass.LoadManager
         public async Task<Action> Initialization(CancellationToken token)
         {
             _isInited = true;
-            Action action = OnSceneStart;
             await Task.CompletedTask;
-            return action;
+            return OnSceneStart;
         }
 
         private void OnSceneStart()

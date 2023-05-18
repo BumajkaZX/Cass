@@ -88,7 +88,7 @@ Transform:
   m_GameObject: {fileID: 1980494322214258350}
   m_LocalRotation: {x: 0.7069648, y: -0, z: -0, w: 0.70724875}
   m_LocalPosition: {x: 0.0037999805, y: 0.012, z: 0.001}
-  m_LocalScale: {x: 10, y: 10, z: 10}
+  m_LocalScale: {x: 30, y: 30, z: 30}
   m_ConstrainProportionsScale: 1
   m_Children:
   - {fileID: 3158486600089391648}
@@ -166,9 +166,9 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _jumpEnable: 0
   _dashEnable: 0
-  _moveSpeed: 1.2
+  _moveSpeed: 4
   _jumpForce: 380
-  _distanceToGround: 0.18
+  _distanceToGround: 0.54
   _groundLayers:
     serializedVersion: 2
     m_Bits: 823
@@ -294,7 +294,7 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1980494322214258350}
-  m_Enabled: 1
+  m_Enabled: 0
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: df2868252ab5c4d1da357e8f11f1b524, type: 3}
   m_Name: 

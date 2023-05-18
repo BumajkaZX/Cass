@@ -29,6 +29,9 @@ namespace Cass.Character
         [SerializeField]
         private bool _dashEnable = false;
 
+        [SerializeField]
+        private bool _isOtherSide = false;
+
         [Space(20)]
 
         [SerializeField, Range(0, 10)]
@@ -203,7 +206,7 @@ namespace Cass.Character
                     return;
                 }
 
-                Vector3 move = new Vector3(moveInput.x, 0, moveInput.y);
+                Vector3 move = new Vector3(_isOtherSide ? -moveInput.y : moveInput.y, 0, _isOtherSide ? moveInput.x : -moveInput.x);
                 _rb.AddForce(_moveSpeed * MOVE_MULTIPLY * Time.deltaTime * move, ForceMode.VelocityChange);
             }).AddTo(_disposables);
 
@@ -341,6 +344,8 @@ namespace Cass.Character
             }
 
             _inputActions.Main.Disable();
+
+            _inputActions.Dispose();
 
             if (_dashEnable)
             {
