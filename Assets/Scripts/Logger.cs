@@ -23,12 +23,11 @@ namespace Cass.Logger
 
         public Task<Action> Initialization(CancellationToken token)
         {
-            Action act = null;
             Debug.LogError("LOGGGGGGGG");
             if(Instance != null)
             {
                 Destroy(this);
-                return Task.FromResult(act);
+                return Task.FromResult<Action>(null);
             }
             else
             {
@@ -38,7 +37,7 @@ namespace Cass.Logger
 
             _isInited = true;
 
-            return Task.FromResult(act);
+            return Task.FromResult<Action>(null);
         }
 
         public void Log(string message)

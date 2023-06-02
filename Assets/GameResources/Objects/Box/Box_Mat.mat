@@ -78,7 +78,7 @@ Material:
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
     - _Normal:
-        m_Texture: {fileID: 2800000, guid: 7df24e5ab51c38b419766e714419a5cf, type: 3}
+        m_Texture: {fileID: 0}
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
     - _OcclusionMap:
@@ -112,6 +112,11 @@ Material:
     - _Blend: 0
     - _BlendModePreserveSpecular: 1
     - _BumpScale: 1
+    - _CelAmbient: 1.29
+    - _CelFalloffAmount: 0.46
+    - _CelFresnelSize: 1.8
+    - _CelLightingCutoff: 0.64
+    - _CelSmoothness: 16.16
     - _ClearCoatMask: 0
     - _ClearCoatSmoothness: 0
     - _Color: 0
@@ -119,8 +124,8 @@ Material:
     - _Cutoff: 0.5
     - _DetailAlbedoMapScale: 1
     - _DetailNormalMapScale: 1
-    - _DitherStrenght: 1.26
-    - _DitherStrenghtColor: 0.05
+    - _DitherStrenght: 1.65
+    - _DitherStrenghtColor: 0.02
     - _DstBlend: 0
     - _DstBlendAlpha: 0
     - _Emission: 0
@@ -128,6 +133,7 @@ Material:
     - _GlossMapScale: 0
     - _Glossiness: 0
     - _GlossyReflections: 0
+    - _Metal: 0
     - _Metallic: 0
     - _OcclusionStrength: 1
     - _Parallax: 0.005
@@ -144,6 +150,8 @@ Material:
     - _ZWrite: 1
     m_Colors:
     - _BaseColor: {r: 1, g: 1, b: 1, a: 1}
+    - _CelFresnelColor: {r: 0.65958196, g: 1, b: 0.6367924, a: 0}
+    - _CelSpecularColor: {r: 0.3207547, g: 0.3207547, b: 0.3207547, a: 1}
     - _Color: {r: 1, g: 1, b: 1, a: 1}
     - _DefaultColor: {r: 0, g: 0, b: 0, a: 0}
     - _EmissionColor: {r: 0, g: 0, b: 0, a: 1}

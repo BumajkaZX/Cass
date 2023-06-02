@@ -449,7 +449,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   LoadScene: Loading
-  MenuScene: Main Location
+  MenuScene: Tutor
   FirstTutorScene: Tutor
   LoadComplete:
     value: 0

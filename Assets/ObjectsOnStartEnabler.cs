@@ -22,9 +22,7 @@ public class ObjectsOnStartEnabler : MonoBehaviour, ILoadingCondition
     {
         _isInit = true;
 
-        Action act = OnSceneStart;
-
-        return Task.FromResult(act);
+        return Task.FromResult<Action>(OnSceneStart);
     }
 
     private void OnSceneStart()

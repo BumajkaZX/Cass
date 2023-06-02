@@ -94,10 +94,10 @@ namespace Cass.LoadManager
 
                 await InitScripts();
 
+                LoadComplete.SetValueAndForceNotify(true);
+
                 _onSceneStart();
             }
-
-            LoadComplete.SetValueAndForceNotify(true);
 
             if (waitForTouch)
             {
@@ -106,6 +106,8 @@ namespace Cass.LoadManager
                 SceneManager.SetActiveScene(SceneManager.GetSceneByName(sceneName));
 
                 await InitScripts();
+
+                LoadComplete.SetValueAndForceNotify(true);
 
                 await WaitAction();
 

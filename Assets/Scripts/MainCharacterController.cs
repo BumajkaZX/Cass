@@ -21,8 +21,16 @@ namespace Cass.Character
 
         private const float SCALE_TO_LOCAL = 10f;
 
+        /// <summary>
+        /// For camera
+        /// </summary>
+        public static ReactiveProperty<Transform> TargetTransform = new ReactiveProperty<Transform>();
+
         public ReactiveProperty<int> DashAvailableCount => _dashAvailable;
 
+        [SerializeField]
+        private Transform _targetTransform = default;
+            
         [SerializeField]
         private bool _jumpEnable = false;
 
@@ -71,6 +79,12 @@ namespace Cass.Character
 
         [SerializeField, Range(0, 5)]
         private float _scaleÑoefficient = 1f;
+
+        [SerializeField, Range(0, 100)]
+        private float _rotationCoefficient = 2f;
+
+        [SerializeField, Range(1, 10)]
+        private float _rotationRecoverySpeed = 2f;
 
         [Space(20)]
 
@@ -143,7 +157,10 @@ namespace Cass.Character
             if (!IsOwner)
             {
                 Destroy(this);
+                return;
             }
+
+            TargetTransform.SetValueAndForceNotify(_targetTransform);
         }
 
         private void Awake()
@@ -170,7 +187,16 @@ namespace Cass.Character
             _inputActions = new MainCharacterInput();
             _inputActions.Main.Enable();
 
-            //Grounded
+
+            AddGroundedControl();
+            AddGravity();
+            AddMovement();
+            
+
+            
+        }
+        private void AddGroundedControl()
+        {
             Observable.EveryFixedUpdate().Subscribe(_ =>
             {
                 bool currentGrounded = _isGrounded;
@@ -186,20 +212,29 @@ namespace Cass.Character
                 }
 
             }).AddTo(_disposables);
-
+        }
+        private void AddMovement()
+        {
             //Movement
-            Observable.EveryUpdate().Select(x => _inputActions.Main.Move.ReadValue<Vector2>()).Subscribe(moveInput =>
+            Observable.EveryFixedUpdate().Select(x => _inputActions.Main.Move.ReadValue<Vector2>()).Subscribe(moveInput =>
             {
                 if (!isActiveAndEnabled)
                 {
                     return;
                 }
 
+                Vector3 relativePosition = _springTransform.position - transform.position;
+
+                float coef = _rotationCoefficient * SCALE_TO_LOCAL;
+
+                Vector3 rotation = new Vector3(transform.rotation.eulerAngles.x, transform.rotation.eulerAngles.y, -relativePosition.z * coef);
+
+                transform.rotation = Quaternion.Lerp(transform.rotation, Quaternion.Euler(rotation), Time.deltaTime * _rotationRecoverySpeed);
+
                 if (moveInput == Vector2.zero)
                 {
                     if (_springTransform != null)
                     {
-                        Vector3 relativePosition = _springTransform.position - transform.position;
                         relativePosition = new Vector3(relativePosition.x, 0, relativePosition.z);
                         _rb.AddForce(relativePosition * _slidePower, ForceMode.Acceleration);
                     }
@@ -208,29 +243,13 @@ namespace Cass.Character
 
                 Vector3 move = new Vector3(_isOtherSide ? -moveInput.y : moveInput.y, 0, _isOtherSide ? moveInput.x : -moveInput.x);
                 _rb.AddForce(_moveSpeed * MOVE_MULTIPLY * Time.deltaTime * move, ForceMode.VelocityChange);
+
+                transform.rotation = Quaternion.Euler(transform.rotation.eulerAngles.x, Quaternion.LookRotation(move, _rb.transform.up).eulerAngles.y, transform.rotation.eulerAngles.z);
+
             }).AddTo(_disposables);
-
-            if (_jumpEnable)
-            {
-                //Jump
-                Observable.EveryUpdate().Where(_ => _inputActions.Main.Jump.WasPressedThisFrame()).Subscribe(_ =>
-                {
-                    if (!isActiveAndEnabled || !_isGrounded)
-                    {
-                        return;
-                    }
-
-
-                    _jumpPool.Get(out MultiParticlesPlayer particle);
-                    ReturnParticle(particle, _jumpPool);
-
-                    _jumpSound.Play();
-
-                    _rb.AddForce(Vector3.up * _jumpForce, ForceMode.Acceleration);
-                }).AddTo(_disposables);
-            }
-
-            //Scale control
+        }
+        private void AddScaleControl()
+        {
             if (_springTransform != null)
             {
                 Observable.EveryFixedUpdate().Subscribe(_ =>
@@ -254,8 +273,9 @@ namespace Cass.Character
                     transform.localScale = newScale;
                 }).AddTo(_disposables);
             }
-
-            //Custom gravity
+        }
+        private void AddGravity()
+        {
             Observable.EveryFixedUpdate().Subscribe(_ =>
             {
                 if (!isActiveAndEnabled)
@@ -276,7 +296,9 @@ namespace Cass.Character
 
                 _rb.AddForce(-Vector3.up * gravity, ForceMode.Acceleration);
             }).AddTo(_disposables);
-
+        }
+        private void AddDash()
+        {
             if (_dashEnable)
             {
                 //Dash
@@ -287,8 +309,8 @@ namespace Cass.Character
                         return;
                     }
 
-                //Set particle rotation
-                _dashPool.Get(out MultiParticlesPlayer particle);
+                    //Set particle rotation
+                    _dashPool.Get(out MultiParticlesPlayer particle);
                     var lookPos = new Vector3(transform.position.x - moveInput.x, transform.position.y, transform.position.z - moveInput.y);
                     particle.transform.LookAt(lookPos);
                     ReturnParticle(particle, _dashPool);
@@ -297,6 +319,28 @@ namespace Cass.Character
 
                     Vector3 dashDir = new Vector3(moveInput.x, _dashUp, moveInput.y) * _dashForce;
                     _rb.AddForce(dashDir, ForceMode.VelocityChange);
+                }).AddTo(_disposables);
+            }
+        }
+        private void AddJump()
+        {
+            if (_jumpEnable)
+            {
+                //Jump
+                Observable.EveryUpdate().Where(_ => _inputActions.Main.Jump.WasPressedThisFrame()).Subscribe(_ =>
+                {
+                    if (!isActiveAndEnabled || !_isGrounded)
+                    {
+                        return;
+                    }
+
+
+                    _jumpPool.Get(out MultiParticlesPlayer particle);
+                    ReturnParticle(particle, _jumpPool);
+
+                    _jumpSound.Play();
+
+                    _rb.AddForce(Vector3.up * _jumpForce, ForceMode.Acceleration);
                 }).AddTo(_disposables);
             }
         }

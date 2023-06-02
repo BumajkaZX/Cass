@@ -6,7 +6,7 @@ namespace Cass.FirstEntry
     {
         public override bool IsFirstEntry()
         {
-            return true;
+            return false;
         }
     }
 }

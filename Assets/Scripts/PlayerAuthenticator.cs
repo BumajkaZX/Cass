@@ -29,7 +29,6 @@ namespace Cass.Services
 
         public Task<Action> Initialization(CancellationToken token)
         {
-            Action act = null;
 #if UNITY_ANDROID
 
             if (ConnectionManager.Instance.IsConnected.Value)
@@ -46,7 +45,7 @@ namespace Cass.Services
 #endif
 
      
-            return Task.FromResult(act);
+            return Task.FromResult<Action>(null);
         }
 
 #if UNITY_ANDROID

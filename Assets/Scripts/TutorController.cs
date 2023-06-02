@@ -4,6 +4,10 @@ using System.Threading;
 using System.Threading.Tasks;
 using UnityEngine;
 using Cass.FirstEntry;
+using Unity.Netcode;
+using Cinemachine;
+using Cass.Character;
+using UniRx;
 
 public class TutorController : MonoBehaviour, ILoadingCondition
 {
@@ -13,15 +17,20 @@ public class TutorController : MonoBehaviour, ILoadingCondition
 
     public bool IsInited => _isInited;
 
+    [SerializeField]
+    private CinemachineVirtualCamera _virtualCamera = default;
+
+    private NetworkManager _networkManager = default;
+
     private bool _isInited = false;
 
-    public  Task<Action> Initialization(CancellationToken token)
+    public Task<Action> Initialization(CancellationToken token)
     {
         _isInited = true;
 
-        Action act = OnSceneStart;
+        _networkManager = FindObjectOfType<NetworkManager>();
 
-        return Task.FromResult(act) ;
+        return Task.FromResult<Action>(OnSceneStart);
     }
 
     private void OnSceneStart()
@@ -41,11 +50,16 @@ public class TutorController : MonoBehaviour, ILoadingCondition
 
     private void FirstEntry()
     {
-
     }
 
     private void TutorialStart()
     {
+        _networkManager.StartHost();
 
+        MainCharacterController.TargetTransform.Subscribe(target => 
+        {
+            _virtualCamera.Follow = target;
+            _virtualCamera.LookAt = target;
+        }).Dispose();
     }
 }

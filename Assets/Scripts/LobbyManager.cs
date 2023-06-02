@@ -82,6 +82,7 @@ public class LobbyManager : MonoBehaviour
         }
         catch(LobbyServiceException ex)
         {
+            Debug.Log(ex);
             return null;
         }
     }
