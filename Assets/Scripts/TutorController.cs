@@ -20,6 +20,12 @@ public class TutorController : MonoBehaviour, ILoadingCondition
     [SerializeField]
     private CinemachineVirtualCamera _virtualCamera = default;
 
+    [SerializeField]
+    private Transform _playerSpawnPos = default;
+
+    [SerializeField]
+    private NetworkObject _playerNetworkObject = default;
+
     private NetworkManager _networkManager = default;
 
     private bool _isInited = false;
@@ -29,6 +35,18 @@ public class TutorController : MonoBehaviour, ILoadingCondition
         _isInited = true;
 
         _networkManager = FindObjectOfType<NetworkManager>();
+
+        var player = Instantiate(_playerNetworkObject);
+
+        player.transform.position = _playerSpawnPos.position;
+
+        _networkManager.StartHost();
+
+        MainCharacterController.TargetTransform.Where(_ => _ != null).Subscribe(target =>
+        {
+            _virtualCamera.Follow = target;
+            _virtualCamera.LookAt = target;
+        }).AddTo(this);
 
         return Task.FromResult<Action>(OnSceneStart);
     }
@@ -54,12 +72,6 @@ public class TutorController : MonoBehaviour, ILoadingCondition
 
     private void TutorialStart()
     {
-        _networkManager.StartHost();
-
-        MainCharacterController.TargetTransform.Subscribe(target => 
-        {
-            _virtualCamera.Follow = target;
-            _virtualCamera.LookAt = target;
-        }).Dispose();
+        
     }
 }
