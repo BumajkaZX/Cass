@@ -10,14 +10,12 @@ namespace Cass.Character
     /// <summary>
     /// Character Controller
     /// </summary>
-    [RequireComponent(typeof(Rigidbody), typeof(Collider))]
+    [RequireComponent(typeof(CharacterController), typeof(Collider))]
     public class MainCharacterController : NetworkBehaviour
     {
         #region params
 
         private const float ZERO_ACCURACY = 0.005f;
-
-        private const float MOVE_MULTIPLY = 10f;
 
         private const float SCALE_TO_LOCAL = 10f;
 
@@ -30,6 +28,9 @@ namespace Cass.Character
 
         [SerializeField]
         private Transform _targetTransform = default;
+
+        [SerializeField, Header("Object to rotate in move")]
+        private Transform _rotateTransform = default;
             
         [SerializeField]
         private bool _jumpEnable = false;
@@ -42,7 +43,7 @@ namespace Cass.Character
 
         [Space(20)]
 
-        [SerializeField, Range(0, 10)]
+        [SerializeField, Range(0, 100)]
         private float _moveSpeed = 1f;
 
         [SerializeField, Range(0, 1000)]
@@ -138,7 +139,7 @@ namespace Cass.Character
 
         private ObjectPool<MultiParticlesPlayer> _jumpPool = default;
 
-        private Rigidbody _rb = default;
+        private CharacterController _chController = default;
 
         private MainCharacterInput _inputActions = default;
 
@@ -164,8 +165,8 @@ namespace Cass.Character
         }
 
         private void Awake()
-        {
-            _rb = GetComponent<Rigidbody>();
+        { 
+            _chController = GetComponent<CharacterController>();
 
             if (_dashEnable)
             {
@@ -191,9 +192,7 @@ namespace Cass.Character
             AddGroundedControl();
             AddGravity();
             AddMovement();
-            
-
-            
+            AddScaleControl();
         }
         private void AddGroundedControl()
         {
@@ -216,35 +215,35 @@ namespace Cass.Character
         private void AddMovement()
         {
             //Movement
-            Observable.EveryFixedUpdate().Select(x => _inputActions.Main.Move.ReadValue<Vector2>()).Subscribe(moveInput =>
+            Observable.EveryUpdate().Select(x => _inputActions.Main.Move.ReadValue<Vector2>()).Subscribe(moveInput =>
             {
                 if (!isActiveAndEnabled)
                 {
                     return;
                 }
 
-                Vector3 relativePosition = _springTransform.position - transform.position;
+               Vector3 relativePosition = _springTransform.position - transform.position;
 
-                float coef = _rotationCoefficient * SCALE_TO_LOCAL;
+               float coef = _rotationCoefficient * SCALE_TO_LOCAL;
 
-                Vector3 rotation = new Vector3(transform.rotation.eulerAngles.x, transform.rotation.eulerAngles.y, -relativePosition.z * coef);
+               Vector3 rotation = new Vector3(_rotateTransform.localRotation.eulerAngles.x, _rotateTransform.localRotation.eulerAngles.y, -relativePosition.z * coef);
 
-                transform.rotation = Quaternion.Lerp(transform.rotation, Quaternion.Euler(rotation), Time.deltaTime * _rotationRecoverySpeed);
+               _rotateTransform.localRotation = Quaternion.Lerp(_rotateTransform.localRotation, Quaternion.Euler(rotation), Time.deltaTime * _rotationRecoverySpeed);
 
                 if (moveInput == Vector2.zero)
                 {
                     if (_springTransform != null)
                     {
                         relativePosition = new Vector3(relativePosition.x, 0, relativePosition.z);
-                        _rb.AddForce(relativePosition * _slidePower, ForceMode.Acceleration);
+                        _chController.Move(relativePosition * _slidePower);
                     }
                     return;
                 }
 
                 Vector3 move = new Vector3(_isOtherSide ? -moveInput.y : moveInput.y, 0, _isOtherSide ? moveInput.x : -moveInput.x);
-                _rb.AddForce(_moveSpeed * MOVE_MULTIPLY * Time.deltaTime * move, ForceMode.VelocityChange);
+                _chController.Move(_moveSpeed * Time.deltaTime * move);
 
-                transform.rotation = Quaternion.Euler(transform.rotation.eulerAngles.x, Quaternion.LookRotation(move, _rb.transform.up).eulerAngles.y, transform.rotation.eulerAngles.z);
+                _rotateTransform.localRotation = Quaternion.Euler(_rotateTransform.localRotation.eulerAngles.x, Quaternion.LookRotation(move, _rotateTransform.forward).eulerAngles.y, _rotateTransform.localRotation.eulerAngles.z);
 
             }).AddTo(_disposables);
         }
@@ -271,6 +270,7 @@ namespace Cass.Character
                         newScale = Vector3.LerpUnclamped(_defaultScale, _scaleUp * _defaultScale.x, interpolator);
                     }
                     transform.localScale = newScale;
+
                 }).AddTo(_disposables);
             }
         }
@@ -285,16 +285,16 @@ namespace Cass.Character
 
                 float gravity = _gravity;
 
-                if (_rb.velocity.y > ZERO_ACCURACY)
+                if (_chController.velocity.y > ZERO_ACCURACY)
                 {
                     gravity *= _gravityUpScale;
                 }
-                else if (_rb.velocity.y < -_gravityDownThreshold)
+                else if (_chController.velocity.y < -_gravityDownThreshold)
                 {
                     gravity *= _gravityDownScale;
                 }
 
-                _rb.AddForce(-Vector3.up * gravity, ForceMode.Acceleration);
+                _chController.Move(-Vector3.up * gravity);
             }).AddTo(_disposables);
         }
         private void AddDash()
@@ -318,7 +318,7 @@ namespace Cass.Character
                     DashUse();
 
                     Vector3 dashDir = new Vector3(moveInput.x, _dashUp, moveInput.y) * _dashForce;
-                    _rb.AddForce(dashDir, ForceMode.VelocityChange);
+                    _chController.Move(dashDir);
                 }).AddTo(_disposables);
             }
         }
@@ -326,6 +326,7 @@ namespace Cass.Character
         {
             if (_jumpEnable)
             {
+                
                 //Jump
                 Observable.EveryUpdate().Where(_ => _inputActions.Main.Jump.WasPressedThisFrame()).Subscribe(_ =>
                 {
@@ -340,7 +341,8 @@ namespace Cass.Character
 
                     _jumpSound.Play();
 
-                    _rb.AddForce(Vector3.up * _jumpForce, ForceMode.Acceleration);
+                    _chController.Move(Vector3.up * _jumpForce);
+                   
                 }).AddTo(_disposables);
             }
         }
