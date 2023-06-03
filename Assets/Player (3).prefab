@@ -164,19 +164,19 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _targetTransform: {fileID: 1038989376266254040}
   _rotateTransform: {fileID: 3940147408355692973}
-  _jumpEnable: 0
+  _jumpEnable: 1
   _dashEnable: 0
   _isOtherSide: 0
   _moveSpeed: 8.5
-  _jumpForce: 4
-  _distanceToGround: 1.2
+  _jumpForce: 0.123
+  _distanceToGround: 0.8
   _groundLayers:
     serializedVersion: 2
     m_Bits: 823
-  _gravityUpScale: 0.1
-  _gravityDownScale: 0.2
-  _gravity: 0.3
-  _gravityDownThreshold: 0.0264
+  _gravityUpScale: 0.029
+  _gravityDownScale: 0.023
+  _gravity: 0.171
+  _gravityDownThreshold: 0.1014
   _springTransform: {fileID: 2287576840977715339}
   _scaleDown: {x: 0.95, y: 1.07, z: 0.95}
   _scaleUp: {x: 1.07, y: 0.95, z: 1.07}

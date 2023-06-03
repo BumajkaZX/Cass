@@ -46,7 +46,7 @@ namespace Cass.Character
         [SerializeField, Range(0, 100)]
         private float _moveSpeed = 1f;
 
-        [SerializeField, Range(0, 1000)]
+        [SerializeField, Range(0, 1)]
         private float _jumpForce = 1f;
 
         [SerializeField, Range(0, 10)]
@@ -55,14 +55,14 @@ namespace Cass.Character
         [SerializeField]
         private LayerMask _groundLayers = default;
 
-        [SerializeField, Range(0, 1)]
+        [SerializeField, Range(0, 0.3f)]
         private float _gravityUpScale = 0.5f;
 
-        [SerializeField, Range(0, 100)]
-        private float _gravityDownScale = 2f;
+        [SerializeField, Range(0, 0.3f)]
+        private float _gravityDownScale = 1f;
 
-        [SerializeField, Range(0, 10)]
-        private float _gravity = 9.81f;
+        [SerializeField, Range(0, 0.5f)]
+        private float _gravity = 0.5f;
 
         [SerializeField, Range(0.001f, 0.2f)]
         private float _gravityDownThreshold = 0.1f;
@@ -151,6 +151,8 @@ namespace Cass.Character
 
         private bool _isGrounded = true;
 
+        private Vector3 _veloctityY = default;
+
         #endregion
 
         public override void OnNetworkSpawn()
@@ -193,7 +195,26 @@ namespace Cass.Character
             AddGravity();
             AddMovement();
             AddScaleControl();
+            AddJump();
+
+
+            AddVerticalVelocityControl();
         }
+
+        private void AddVerticalVelocityControl()
+        {
+            Observable.EveryUpdate().Subscribe(_ => 
+            {
+                if(!isActiveAndEnabled)
+                {
+                    return;
+                }
+
+                _chController.Move(_veloctityY);
+
+            }).AddTo(_disposables);
+        }
+
         private void AddGroundedControl()
         {
             Observable.EveryFixedUpdate().Subscribe(_ =>
@@ -207,7 +228,10 @@ namespace Cass.Character
                     _landPool.Get(out MultiParticlesPlayer particle);
                     ReturnParticle(particle, _landPool);
 
-                    _landSound.Play();
+                    _veloctityY = Vector3.zero;
+
+
+                    //_landSound.Play();
                 }
 
             }).AddTo(_disposables);
@@ -276,9 +300,9 @@ namespace Cass.Character
         }
         private void AddGravity()
         {
-            Observable.EveryFixedUpdate().Subscribe(_ =>
+            Observable.EveryUpdate().Subscribe(_ =>
             {
-                if (!isActiveAndEnabled)
+                if (!isActiveAndEnabled || _isGrounded)
                 {
                     return;
                 }
@@ -294,7 +318,8 @@ namespace Cass.Character
                     gravity *= _gravityDownScale;
                 }
 
-                _chController.Move(-Vector3.up * gravity);
+               _veloctityY -= Vector3.up * gravity;
+
             }).AddTo(_disposables);
         }
         private void AddDash()
@@ -341,7 +366,7 @@ namespace Cass.Character
 
                     _jumpSound.Play();
 
-                    _chController.Move(Vector3.up * _jumpForce);
+                    _veloctityY = Vector3.up * _jumpForce;
                    
                 }).AddTo(_disposables);
             }
