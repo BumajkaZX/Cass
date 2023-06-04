@@ -17,6 +17,12 @@ public class CameraAimController : MonoBehaviour, ILoadingCondition
 
     public bool IsInited => _isInited;
 
+    [SerializeField, Range(0, 0.2f)]
+    private float _followPower = 1f;
+
+    [SerializeField, Range(0, 0.2f)]
+    private float _aimPower = 1f;
+
     private bool _isInited = false;
 
     private CinemachineVirtualCamera _virtualCamera = default;
@@ -32,6 +38,17 @@ public class CameraAimController : MonoBehaviour, ILoadingCondition
 
     private void OnSceneStart()
     {
-       
+        var transposer = _virtualCamera.GetCinemachineComponent<CinemachineTransposer>();
+        var composer = _virtualCamera.GetCinemachineComponent<CinemachineComposer>();
+        var defaultOffsetTransposer = transposer.m_FollowOffset;
+        var defaultOffsetComposer = composer.m_TrackedObjectOffset;
+        var target = _virtualCamera.Follow;
+
+        Observable.EveryUpdate().Subscribe(_ =>
+        {
+            transposer.m_FollowOffset = defaultOffsetTransposer + new Vector3(0, 0, -target.position.z * _followPower);
+            composer.m_TrackedObjectOffset = defaultOffsetComposer + new Vector3(0, target.position.z * _aimPower, 0);
+        }).AddTo(this);
+
     }
 }
