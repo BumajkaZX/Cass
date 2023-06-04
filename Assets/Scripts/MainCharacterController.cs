@@ -19,6 +19,8 @@ namespace Cass.Character
 
         private const float SCALE_TO_LOCAL = 10f;
 
+        private const float GRAVITY_MULTIPLY = 100f;
+
         /// <summary>
         /// For camera
         /// </summary>
@@ -29,8 +31,8 @@ namespace Cass.Character
         [SerializeField]
         private Transform _targetTransform = default;
 
-        [SerializeField, Header("Object to rotate in move")]
-        private Transform _rotateTransform = default;
+        [SerializeField, Header("Root object to change scale/rotation")]
+        private Transform _rootChangeTransform = default;
             
         [SerializeField]
         private bool _jumpEnable = false;
@@ -55,13 +57,13 @@ namespace Cass.Character
         [SerializeField]
         private LayerMask _groundLayers = default;
 
-        [SerializeField, Range(0, 0.3f)]
+        [SerializeField, Range(0, 2)]
         private float _gravityUpScale = 0.5f;
 
-        [SerializeField, Range(0, 0.3f)]
+        [SerializeField, Range(0, 3)]
         private float _gravityDownScale = 1f;
 
-        [SerializeField, Range(0, 0.5f)]
+        [SerializeField, Range(0, 2)]
         private float _gravity = 0.5f;
 
         [SerializeField, Range(0.001f, 0.2f)]
@@ -92,17 +94,17 @@ namespace Cass.Character
         [SerializeField, Range(0, 10)]
         private float _slidePower = 2f;
 
+        [SerializeField, Range(0, 1)]
+        private float _dashSeconds = 0.2f;
+
         [SerializeField, Range(0, 10)]
         private int _dashCount = 1;
 
         [SerializeField, Range(0, 10)]
         private float _dashRechargeTime = 2f;
 
-        [SerializeField, Range(0, 100)]
-        private float _dashForce = 10f;
-
-        [SerializeField, Range(0, 2)]
-        private float _dashUp = 1f;
+        [SerializeField, Range(1, 4)]
+        private float _dashForce = 1f;
 
         [SerializeField]
         private int _dashPoolCount = default;
@@ -153,6 +155,10 @@ namespace Cass.Character
 
         private Vector3 _veloctityY = default;
 
+        private Vector3 _velocityXZ = default;
+
+        private bool _isUseDash = false;
+
         #endregion
 
         public override void OnNetworkSpawn()
@@ -184,7 +190,7 @@ namespace Cass.Character
         }
         private void Start()
         {
-            _defaultScale = transform.localScale;
+            _defaultScale = _rootChangeTransform.localScale;
             _dashAvailable.Value = _dashCount;
 
             _inputActions = new MainCharacterInput();
@@ -196,9 +202,28 @@ namespace Cass.Character
             AddMovement();
             AddScaleControl();
             AddJump();
+            AddDash();
 
 
             AddVerticalVelocityControl();
+            AddHorizontalVelocityControl();
+        }
+
+        private void AddHorizontalVelocityControl()
+        {
+            //TODO: бля, ну надо ограничитель 200% попозже накину, надеюсь))00000))))
+            Observable.EveryUpdate().Subscribe(_ =>
+            {
+                if (!isActiveAndEnabled)
+                {
+                    return;
+                }
+
+                _chController.Move(_velocityXZ);
+
+                _velocityXZ = Vector3.zero;
+
+            }).AddTo(_disposables);
         }
 
         private void AddVerticalVelocityControl()
@@ -250,24 +275,27 @@ namespace Cass.Character
 
                float coef = _rotationCoefficient * SCALE_TO_LOCAL;
 
-               Vector3 rotation = new Vector3(_rotateTransform.localRotation.eulerAngles.x, _rotateTransform.localRotation.eulerAngles.y, -relativePosition.z * coef);
+               Vector3 rotation = new Vector3(_rootChangeTransform.localRotation.eulerAngles.x, _rootChangeTransform.localRotation.eulerAngles.y, -relativePosition.z * coef);
 
-               _rotateTransform.localRotation = Quaternion.Lerp(_rotateTransform.localRotation, Quaternion.Euler(rotation), Time.deltaTime * _rotationRecoverySpeed);
+               _rootChangeTransform.localRotation = Quaternion.Lerp(_rootChangeTransform.localRotation, Quaternion.Euler(rotation), Time.deltaTime * _rotationRecoverySpeed);
 
                 if (moveInput == Vector2.zero)
                 {
                     if (_springTransform != null)
                     {
                         relativePosition = new Vector3(relativePosition.x, 0, relativePosition.z);
-                        _chController.Move(relativePosition * _slidePower);
+                        _velocityXZ += relativePosition * _slidePower;
                     }
                     return;
                 }
 
                 Vector3 move = new Vector3(_isOtherSide ? -moveInput.y : moveInput.y, 0, _isOtherSide ? moveInput.x : -moveInput.x);
-                _chController.Move(_moveSpeed * Time.deltaTime * move);
 
-                _rotateTransform.localRotation = Quaternion.Euler(_rotateTransform.localRotation.eulerAngles.x, Quaternion.LookRotation(move, _rotateTransform.forward).eulerAngles.y, _rotateTransform.localRotation.eulerAngles.z);
+                float dashPower = _isUseDash ? _dashForce : 1;
+
+                _velocityXZ += _moveSpeed * Time.deltaTime * move * dashPower;
+
+                _rootChangeTransform.localRotation = Quaternion.Euler(_rootChangeTransform.localRotation.eulerAngles.x, Quaternion.LookRotation(move, _rootChangeTransform.forward).eulerAngles.y, _rootChangeTransform.localRotation.eulerAngles.z);
 
             }).AddTo(_disposables);
         }
@@ -293,7 +321,7 @@ namespace Cass.Character
                     {
                         newScale = Vector3.LerpUnclamped(_defaultScale, _scaleUp * _defaultScale.x, interpolator);
                     }
-                    transform.localScale = newScale;
+                    _rootChangeTransform.localScale = newScale;
 
                 }).AddTo(_disposables);
             }
@@ -307,15 +335,15 @@ namespace Cass.Character
                     return;
                 }
 
-                float gravity = _gravity;
+                float gravity = _gravity / GRAVITY_MULTIPLY;
 
                 if (_chController.velocity.y > ZERO_ACCURACY)
                 {
-                    gravity *= _gravityUpScale;
+                    gravity *= _gravityUpScale / GRAVITY_MULTIPLY;
                 }
                 else if (_chController.velocity.y < -_gravityDownThreshold)
                 {
-                    gravity *= _gravityDownScale;
+                    gravity *= _gravityDownScale / GRAVITY_MULTIPLY;
                 }
 
                _veloctityY -= Vector3.up * gravity;
@@ -326,8 +354,9 @@ namespace Cass.Character
         {
             if (_dashEnable)
             {
+                CompositeDisposable rechargeTimer = new CompositeDisposable();
                 //Dash
-                Observable.EveryUpdate().Where(_ => _inputActions.Main.Dash.WasPressedThisFrame() && _dashAvailable.Value > 0 && !_isGrounded).Select(moveInput => _inputActions.Main.Move.ReadValue<Vector2>()).Subscribe(moveInput =>
+                Observable.EveryUpdate().Where(_ => _inputActions.Main.Dash.WasPressedThisFrame() && _dashAvailable.Value > 0 && !_isUseDash).Select(moveInput => _inputActions.Main.Move.ReadValue<Vector2>()).Subscribe(moveInput =>
                 {
                     if (!isActiveAndEnabled || moveInput == Vector2.zero)
                     {
@@ -336,14 +365,20 @@ namespace Cass.Character
 
                     //Set particle rotation
                     _dashPool.Get(out MultiParticlesPlayer particle);
-                    var lookPos = new Vector3(transform.position.x - moveInput.x, transform.position.y, transform.position.z - moveInput.y);
+                    var lookPos = new Vector3(transform.position.x - moveInput.y, transform.position.y, transform.position.z + moveInput.x);
                     particle.transform.LookAt(lookPos);
                     ReturnParticle(particle, _dashPool);
 
                     DashUse();
 
-                    Vector3 dashDir = new Vector3(moveInput.x, _dashUp, moveInput.y) * _dashForce;
-                    _chController.Move(dashDir);
+                    _isUseDash = true;
+
+                    Observable.Timer(TimeSpan.FromSeconds(_dashSeconds)).Subscribe(_ =>
+                    {
+                        _isUseDash = false;
+                        rechargeTimer.Clear();
+                    }).AddTo(rechargeTimer);
+
                 }).AddTo(_disposables);
             }
         }

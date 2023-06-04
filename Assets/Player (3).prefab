@@ -163,19 +163,19 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _targetTransform: {fileID: 1038989376266254040}
-  _rotateTransform: {fileID: 3940147408355692973}
+  _rootChangeTransform: {fileID: 3940147408355692973}
   _jumpEnable: 1
-  _dashEnable: 0
+  _dashEnable: 1
   _isOtherSide: 0
   _moveSpeed: 8.5
-  _jumpForce: 0.123
-  _distanceToGround: 0.8
+  _jumpForce: 0.232
+  _distanceToGround: 0.75
   _groundLayers:
     serializedVersion: 2
     m_Bits: 823
-  _gravityUpScale: 0.029
-  _gravityDownScale: 0.023
-  _gravity: 0.171
+  _gravityUpScale: 0.3
+  _gravityDownScale: 2.2
+  _gravity: 1.2
   _gravityDownThreshold: 0.1014
   _springTransform: {fileID: 2287576840977715339}
   _scaleDown: {x: 0.95, y: 1.07, z: 0.95}
@@ -184,10 +184,10 @@ MonoBehaviour:
   _rotationCoefficient: 12
   _rotationRecoverySpeed: 3
   _slidePower: 0.03
-  _dashCount: 4
-  _dashRechargeTime: 3
-  _dashForce: 5
-  _dashUp: 0.4
+  _dashSeconds: 0.3
+  _dashCount: 5
+  _dashRechargeTime: 0.44
+  _dashForce: 2
   _dashPoolCount: 10
   _dashParticles: {fileID: 928739048565080235, guid: 1ee6b72294319d24eadf81084f48861b,
     type: 3}
