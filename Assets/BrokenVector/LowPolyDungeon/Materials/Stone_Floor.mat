@@ -125,7 +125,7 @@ Material:
     - _ZWrite: 1
     m_Colors:
     - _Color: {r: 1, g: 1, b: 1, a: 1}
-    - _DefaultColor: {r: 0.00965023, g: 0, b: 1, a: 0}
+    - _DefaultColor: {r: 0.017604187, g: 0.14576502, b: 1.2440315, a: 0}
     - _EmissionColor: {r: 0, g: 0, b: 0, a: 1}
     - _GlobalResolution: {r: 426, g: 240, b: 0, a: 0}
   m_BuildTextureStacks: []

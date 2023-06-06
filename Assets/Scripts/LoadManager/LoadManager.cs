@@ -164,7 +164,7 @@ namespace Cass.LoadManager
                     continue;
                 }
 
-                Debug.LogError("Init load " + condition.Name);
+                Debug.Log("Init load " + condition.Name);
                 Task<Action> task = condition.Initialization(_tokenSource.Token);
                 var completedTask = await Task.WhenAny(task, Task.Delay(TimeSpan.FromSeconds(_serviceTimeout), _tokenSource.Token));
                 if (completedTask != task)

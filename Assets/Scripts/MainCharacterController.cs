@@ -6,6 +6,8 @@ namespace Cass.Character
     using UnityEngine.Pool;
     using FMODUnity;
     using Unity.Netcode;
+    using UnityEngine.InputSystem;
+    using UnityEngine.InputSystem.Users;
 
     /// <summary>
     /// Character Controller
@@ -159,6 +161,10 @@ namespace Cass.Character
 
         private bool _isUseDash = false;
 
+        private bool _isGyroActive = false;
+
+        private UnityEngine.InputSystem.Gyroscope _gyro = default;
+
         #endregion
 
         public override void OnNetworkSpawn()
@@ -225,7 +231,6 @@ namespace Cass.Character
 
             }).AddTo(_disposables);
         }
-
         private void AddVerticalVelocityControl()
         {
             Observable.EveryUpdate().Subscribe(_ => 
@@ -239,7 +244,6 @@ namespace Cass.Character
 
             }).AddTo(_disposables);
         }
-
         private void AddGroundedControl()
         {
             Observable.EveryFixedUpdate().Subscribe(_ =>
@@ -315,11 +319,11 @@ namespace Cass.Character
                     Vector3 newScale = _defaultScale;
                     if (relativePosition.y < 0)
                     {
-                        newScale = Vector3.LerpUnclamped(_defaultScale, _scaleDown * _defaultScale.x, interpolator);
+                        newScale = Vector3.LerpUnclamped(_defaultScale, _scaleDown * _defaultScale.x, Mathf.Clamp(interpolator, 0, 3));
                     }
                     else if (relativePosition.y > 0)
                     {
-                        newScale = Vector3.LerpUnclamped(_defaultScale, _scaleUp * _defaultScale.x, interpolator);
+                        newScale = Vector3.LerpUnclamped(_defaultScale, _scaleUp * _defaultScale.x, Mathf.Clamp(interpolator, 0, 3));
                     }
                     _rootChangeTransform.localScale = newScale;
 
@@ -352,36 +356,77 @@ namespace Cass.Character
         }
         private void AddDash()
         {
-            if (_dashEnable)
+            if (!_dashEnable)
             {
-                CompositeDisposable rechargeTimer = new CompositeDisposable();
-                //Dash
-                Observable.EveryUpdate().Where(_ => _inputActions.Main.Dash.WasPressedThisFrame() && _dashAvailable.Value > 0 && !_isUseDash).Select(moveInput => _inputActions.Main.Move.ReadValue<Vector2>()).Subscribe(moveInput =>
+                return;
+            }
+
+            CompositeDisposable rechargeTimer = new CompositeDisposable();
+
+            _gyro = UnityEngine.InputSystem.Gyroscope.current;
+
+            if (SystemInfo.supportsGyroscope)
+            {
+                InputSystem.onActionChange += OnDeviceChange;
+
+                InputSystem.EnableDevice(_gyro);
+            }
+  
+            //Dash
+            Observable.EveryUpdate().Where(_ => IsPressedForDash()).Select(moveInput => _inputActions.Main.Move.ReadValue<Vector2>()).Subscribe(moveInput =>
+            {
+                if (!isActiveAndEnabled || moveInput == Vector2.zero)
                 {
-                    if (!isActiveAndEnabled || moveInput == Vector2.zero)
-                    {
-                        return;
-                    }
+                    return;
+                }
 
-                    //Set particle rotation
-                    _dashPool.Get(out MultiParticlesPlayer particle);
-                    var lookPos = new Vector3(transform.position.x - moveInput.y, transform.position.y, transform.position.z + moveInput.x);
-                    particle.transform.LookAt(lookPos);
-                    ReturnParticle(particle, _dashPool);
+                //Set particle rotation
+                _dashPool.Get(out MultiParticlesPlayer particle);
+                var lookPos = new Vector3(transform.position.x - moveInput.y, transform.position.y, transform.position.z + moveInput.x);
+                particle.transform.LookAt(lookPos);
+                ReturnParticle(particle, _dashPool);
 
-                    DashUse();
+                DashUse();
 
-                    _isUseDash = true;
+                _isUseDash = true;
 
-                    Observable.Timer(TimeSpan.FromSeconds(_dashSeconds)).Subscribe(_ =>
-                    {
-                        _isUseDash = false;
-                        rechargeTimer.Clear();
-                    }).AddTo(rechargeTimer);
+                Observable.Timer(TimeSpan.FromSeconds(_dashSeconds)).Subscribe(_ =>
+                {
+                    _isUseDash = false;
+                    rechargeTimer.Clear();
+                }).AddTo(rechargeTimer);
 
-                }).AddTo(_disposables);
+            }).AddTo(_disposables);
+
+        }
+
+        private bool IsPressedForDash() => (_inputActions.Main.Dash.WasPressedThisFrame() && !_isGyroActive) || (IsGyroDropped() && _isGyroActive) 
+            && _dashAvailable.Value > 0 && !_isUseDash;
+
+        private bool IsGyroDropped()
+        {
+            return false;
+        }
+
+        private void OnDeviceChange(object action, InputActionChange change)
+        {
+            if (change == InputActionChange.ActionPerformed)
+            {
+                string device = ((InputAction)action).activeControl.device.displayName;
+
+                _isGyroActive = !(device == "Keyboard" || device == "Mouse");
+
+                if (_isGyroActive)
+                {
+                    InputSystem.EnableDevice(_gyro);
+                }
+                else
+                {
+                    InputSystem.DisableDevice(_gyro);
+                }
             }
         }
+
         private void AddJump()
         {
             if (_jumpEnable)

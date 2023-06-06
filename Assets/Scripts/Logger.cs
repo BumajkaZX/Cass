@@ -23,7 +23,6 @@ namespace Cass.Logger
 
         public Task<Action> Initialization(CancellationToken token)
         {
-            Debug.LogError("LOGGGGGGGG");
             if(Instance != null)
             {
                 Destroy(this);
