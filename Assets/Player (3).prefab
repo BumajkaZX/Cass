@@ -164,7 +164,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _targetTransform: {fileID: 1038989376266254040}
   _rootChangeTransform: {fileID: 3940147408355692973}
-  _jumpEnable: 1
+  _jumpEnable: 0
   _dashEnable: 1
   _isOtherSide: 0
   _moveSpeed: 8.5

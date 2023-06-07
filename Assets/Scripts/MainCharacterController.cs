@@ -363,17 +363,10 @@ namespace Cass.Character
 
             CompositeDisposable rechargeTimer = new CompositeDisposable();
 
-            _gyro = UnityEngine.InputSystem.Gyroscope.current;
+           // InputSystem.onActionChange += OnDeviceChange;
 
-            if (SystemInfo.supportsGyroscope)
-            {
-                InputSystem.onActionChange += OnDeviceChange;
-
-                InputSystem.EnableDevice(_gyro);
-            }
-  
             //Dash
-            Observable.EveryUpdate().Where(_ => IsPressedForDash()).Select(moveInput => _inputActions.Main.Move.ReadValue<Vector2>()).Subscribe(moveInput =>
+            Observable.EveryUpdate().Where(_ => _inputActions.Main.Dash.WasPressedThisFrame() && _dashAvailable.Value > 0 && !_isUseDash).Select(moveInput => _inputActions.Main.Move.ReadValue<Vector2>()).Subscribe(moveInput =>
             {
                 if (!isActiveAndEnabled || moveInput == Vector2.zero)
                 {
@@ -400,30 +393,12 @@ namespace Cass.Character
 
         }
 
-        private bool IsPressedForDash() => (_inputActions.Main.Dash.WasPressedThisFrame() && !_isGyroActive) || (IsGyroDropped() && _isGyroActive) 
-            && _dashAvailable.Value > 0 && !_isUseDash;
-
-        private bool IsGyroDropped()
-        {
-            return false;
-        }
-
         private void OnDeviceChange(object action, InputActionChange change)
         {
+
             if (change == InputActionChange.ActionPerformed)
             {
                 string device = ((InputAction)action).activeControl.device.displayName;
-
-                _isGyroActive = !(device == "Keyboard" || device == "Mouse");
-
-                if (_isGyroActive)
-                {
-                    InputSystem.EnableDevice(_gyro);
-                }
-                else
-                {
-                    InputSystem.DisableDevice(_gyro);
-                }
             }
         }
 
