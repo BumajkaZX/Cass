@@ -46,6 +46,10 @@ public class CameraAimController : MonoBehaviour, ILoadingCondition
 
         Observable.EveryUpdate().Subscribe(_ =>
         {
+            if (!isActiveAndEnabled)
+            {
+                return;
+            }
             transposer.m_FollowOffset = defaultOffsetTransposer + new Vector3(0, 0, -target.position.z * _followPower);
             composer.m_TrackedObjectOffset = defaultOffsetComposer + new Vector3(0, target.position.z * _aimPower, 0);
         }).AddTo(this);

@@ -66,11 +66,13 @@ GameObject:
   - component: {fileID: 7042338668883944424}
   - component: {fileID: 9011197167972781869}
   - component: {fileID: 7467978698302210462}
+  - component: {fileID: 3378746841195582181}
   - component: {fileID: 4025382086152724543}
   - component: {fileID: 7758533698998798534}
   - component: {fileID: 1254750260192184958}
   - component: {fileID: 7339028467533133294}
   - component: {fileID: 290826753104552497}
+  - component: {fileID: 4338268729693128683}
   m_Layer: 6
   m_Name: Body
   m_TagString: Untagged
@@ -145,11 +147,23 @@ CharacterController:
   serializedVersion: 3
   m_Height: 0.03
   m_Radius: 0.015
-  m_SlopeLimit: 25
+  m_SlopeLimit: 35
   m_StepOffset: 0.3
   m_SkinWidth: 0.08
   m_MinMoveDistance: 0.001
   m_Center: {x: 0, y: 0, z: 0}
+--- !u!114 &3378746841195582181
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1980494322214258350}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 82b475aa39144a247979207c443b824f, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!114 &4025382086152724543
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -168,14 +182,14 @@ MonoBehaviour:
   _dashEnable: 1
   _isOtherSide: 0
   _moveSpeed: 8.5
-  _jumpForce: 0.232
+  _jumpForce: 0.06
   _distanceToGround: 0.75
   _groundLayers:
     serializedVersion: 2
     m_Bits: 823
-  _gravityUpScale: 0.3
-  _gravityDownScale: 2.2
-  _gravity: 1.2
+  _gravityUpScale: 4
+  _gravityDownScale: 5
+  _gravity: 5
   _gravityDownThreshold: 0.1014
   _springTransform: {fileID: 2287576840977715339}
   _scaleDown: {x: 0.95, y: 1.07, z: 0.95}
@@ -320,6 +334,18 @@ MonoBehaviour:
   InLocalSpace: 1
   Interpolate: 1
   SlerpPosition: 0
+--- !u!114 &4338268729693128683
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1980494322214258350}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e1c69afdc4568d247960bbb32d74302d, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &3027508764627804034
 GameObject:
   m_ObjectHideFlags: 0
@@ -653,7 +679,7 @@ MeshRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 2100000, guid: 31321ba15b8f8eb4c954353edc038b1d, type: 2}
+  - {fileID: 2100000, guid: 6775e908d3b927446b5b0d447c9cae95, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -763,7 +789,7 @@ MeshRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 2100000, guid: 31321ba15b8f8eb4c954353edc038b1d, type: 2}
+  - {fileID: 2100000, guid: 6775e908d3b927446b5b0d447c9cae95, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0

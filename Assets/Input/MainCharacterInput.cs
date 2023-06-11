@@ -178,7 +178,7 @@ public partial class @MainCharacterInput: IInputActionCollection2, IDisposable
                 {
                     ""name"": """",
                     ""id"": ""42976e5a-5bf0-42d8-94cd-160986a35301"",
-                    ""path"": ""<Gamepad>/rightTrigger"",
+                    ""path"": ""<Gamepad>/leftShoulder"",
                     ""interactions"": """",
                     ""processors"": """",
                     ""groups"": """",
@@ -190,6 +190,17 @@ public partial class @MainCharacterInput: IInputActionCollection2, IDisposable
                     ""name"": """",
                     ""id"": ""17a88529-1e04-4417-9601-256120a79947"",
                     ""path"": ""<Mouse>/leftButton"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""Fire"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""1e73a79e-9055-43dd-b25e-2782b305a578"",
+                    ""path"": ""<Gamepad>/rightShoulder"",
                     ""interactions"": """",
                     ""processors"": """",
                     ""groups"": """",

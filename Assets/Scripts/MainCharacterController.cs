@@ -6,8 +6,7 @@ namespace Cass.Character
     using UnityEngine.Pool;
     using FMODUnity;
     using Unity.Netcode;
-    using UnityEngine.InputSystem;
-    using UnityEngine.InputSystem.Users;
+    using Cass.VibrationManager;
 
     /// <summary>
     /// Character Controller
@@ -59,13 +58,13 @@ namespace Cass.Character
         [SerializeField]
         private LayerMask _groundLayers = default;
 
-        [SerializeField, Range(0, 2)]
+        [SerializeField, Range(0, 10)]
         private float _gravityUpScale = 0.5f;
 
-        [SerializeField, Range(0, 3)]
+        [SerializeField, Range(0, 10)]
         private float _gravityDownScale = 1f;
 
-        [SerializeField, Range(0, 2)]
+        [SerializeField, Range(0, 10)]
         private float _gravity = 0.5f;
 
         [SerializeField, Range(0.001f, 0.2f)]
@@ -161,14 +160,12 @@ namespace Cass.Character
 
         private bool _isUseDash = false;
 
-        private bool _isGyroActive = false;
-
-        private UnityEngine.InputSystem.Gyroscope _gyro = default;
-
         #endregion
 
         public override void OnNetworkSpawn()
         {
+            PlayersPool.AddPlayer(this);
+
             if (!IsOwner)
             {
                 Destroy(this);
@@ -209,16 +206,25 @@ namespace Cass.Character
             AddScaleControl();
             AddJump();
             AddDash();
+            AddShoot();
 
 
             AddVerticalVelocityControl();
             AddHorizontalVelocityControl();
         }
 
+        private void AddShoot()
+        {
+            Observable.EveryFixedUpdate().Where(_ => _inputActions.Main.Fire.IsPressed()).Subscribe(_ =>
+            {
+                VibrationManager.Vibrate(VibrationManager.VibrationPower.Medium, VibrationManager.VibrationType.Shot);
+            }).AddTo(_disposables);
+        }
+
         private void AddHorizontalVelocityControl()
         {
             //TODO: бля, ну надо ограничитель 200% попозже накину, надеюсь))00000))))
-            Observable.EveryUpdate().Subscribe(_ =>
+            Observable.EveryFixedUpdate().Subscribe(_ =>
             {
                 if (!isActiveAndEnabled)
                 {
@@ -233,7 +239,7 @@ namespace Cass.Character
         }
         private void AddVerticalVelocityControl()
         {
-            Observable.EveryUpdate().Subscribe(_ => 
+            Observable.EveryFixedUpdate().Subscribe(_ => 
             {
                 if(!isActiveAndEnabled)
                 {
@@ -268,7 +274,7 @@ namespace Cass.Character
         private void AddMovement()
         {
             //Movement
-            Observable.EveryUpdate().Select(x => _inputActions.Main.Move.ReadValue<Vector2>()).Subscribe(moveInput =>
+            Observable.EveryFixedUpdate().Select(x => _inputActions.Main.Move.ReadValue<Vector2>()).Subscribe(moveInput =>
             {
                 if (!isActiveAndEnabled)
                 {
@@ -307,7 +313,7 @@ namespace Cass.Character
         {
             if (_springTransform != null)
             {
-                Observable.EveryFixedUpdate().Subscribe(_ =>
+                Observable.EveryUpdate().Subscribe(_ =>
                 {
                     if (!isActiveAndEnabled)
                     {
@@ -332,7 +338,7 @@ namespace Cass.Character
         }
         private void AddGravity()
         {
-            Observable.EveryUpdate().Subscribe(_ =>
+            Observable.EveryFixedUpdate().Subscribe(_ =>
             {
                 if (!isActiveAndEnabled || _isGrounded)
                 {
@@ -392,16 +398,7 @@ namespace Cass.Character
             }).AddTo(_disposables);
 
         }
-
-        private void OnDeviceChange(object action, InputActionChange change)
-        {
-
-            if (change == InputActionChange.ActionPerformed)
-            {
-                string device = ((InputAction)action).activeControl.device.displayName;
-            }
-        }
-
+       
         private void AddJump()
         {
             if (_jumpEnable)
@@ -460,9 +457,25 @@ namespace Cass.Character
                 null,
                 false,
                 poolCount);
+        public void EnableInput(bool enable)
+        {
+            if(_inputActions != null)
+            {
+                if (enable)
+                {
+                    _inputActions.Enable();
+                }
+                else
+                {
+                    _inputActions.Disable();
+                }
+            }
+        }
         public override void OnDestroy()
         {
             base.OnDestroy();
+
+            PlayersPool.RemovePlayer(this);
 
             if (!IsOwner)
             {
