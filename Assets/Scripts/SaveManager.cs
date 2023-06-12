@@ -24,19 +24,12 @@ namespace Cass.Services
 
         public Task<Action> Initialization(CancellationToken token)
         { 
-            if (Instance != null)
-            {
-                Destroy(this);
-
-                return Task.FromResult<Action>(null);
-            }
-            else
-            {
-                Instance = this;
-                DontDestroyOnLoad(gameObject);
-            }
+            Instance = this;
+            DontDestroyOnLoad(gameObject);
 
             ISavedGameClient savedGameClient = PlayGamesPlatform.Instance.SavedGame;
+
+            _isInited = true;
 
             return Task.FromResult<Action>(null);
         }

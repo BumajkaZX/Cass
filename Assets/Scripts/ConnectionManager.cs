@@ -32,16 +32,9 @@ namespace Cass.Services
         public async Task<Action> Initialization(CancellationToken token)
         {
             Action act = null;
-            if (Instance != null)
-            {
-                Destroy(this);
-                return act;
-            }
-            else
-            {
-                Instance = this;
-                DontDestroyOnLoad(gameObject);
-            }
+
+            Instance = this;
+            DontDestroyOnLoad(gameObject);
 
 #if UNITY_EDITOR
 

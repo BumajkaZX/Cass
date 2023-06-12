@@ -1,18 +1,10 @@
-namespace Cass.Guns
+namespace Cass.Items.Guns
 {
     using UnityEngine;
     using System.Collections.Generic;
 
-    public abstract class AbstractGun : ScriptableObject
+    public abstract class AbstractGun : PlayerItem
     {
-        /// <summary>
-        /// ID
-        /// </summary>
-        public string Id => _id;
-
-        [SerializeField]
-        protected string _id = default;
-
         [SerializeField]
         protected Transform _gunPrefab = default;
 

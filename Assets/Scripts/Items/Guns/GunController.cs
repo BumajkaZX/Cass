@@ -1,4 +1,4 @@
-namespace Cass.Guns 
+namespace Cass.Items.Guns
 {
     using System.Collections;
     using System.Collections.Generic;
