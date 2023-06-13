@@ -182,7 +182,7 @@ MonoBehaviour:
   _dashEnable: 1
   _isOtherSide: 0
   _moveSpeed: 8.5
-  _jumpForce: 0.06
+  _jumpForce: 12
   _distanceToGround: 0.75
   _groundLayers:
     serializedVersion: 2

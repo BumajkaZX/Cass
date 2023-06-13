@@ -20,7 +20,7 @@ namespace Cass.Character
 
         private const float SCALE_TO_LOCAL = 10f;
 
-        private const float GRAVITY_MULTIPLY = 100f;
+        private const float GRAVITY_MULTIPLY = 10f;
 
         /// <summary>
         /// For camera
@@ -49,7 +49,7 @@ namespace Cass.Character
         [SerializeField, Range(0, 100)]
         private float _moveSpeed = 1f;
 
-        [SerializeField, Range(0, 1)]
+        [SerializeField, Range(0, 100)]
         private float _jumpForce = 1f;
 
         [SerializeField, Range(0, 10)]
@@ -58,13 +58,13 @@ namespace Cass.Character
         [SerializeField]
         private LayerMask _groundLayers = default;
 
-        [SerializeField, Range(0, 10)]
+        [SerializeField, Range(0, 40)]
         private float _gravityUpScale = 0.5f;
 
-        [SerializeField, Range(0, 10)]
+        [SerializeField, Range(0, 40)]
         private float _gravityDownScale = 1f;
 
-        [SerializeField, Range(0, 10)]
+        [SerializeField, Range(0, 40)]
         private float _gravity = 0.5f;
 
         [SerializeField, Range(0.001f, 0.2f)]
@@ -215,7 +215,7 @@ namespace Cass.Character
 
         private void AddShoot()
         {
-            Observable.EveryFixedUpdate().Where(_ => _inputActions.Main.Fire.IsPressed()).Subscribe(_ =>
+            Observable.EveryUpdate().Where(_ => _inputActions.Main.Fire.IsPressed()).Subscribe(_ =>
             {
                 VibrationManager.Vibrate(VibrationManager.VibrationPower.Medium, VibrationManager.VibrationType.Shot);
             }).AddTo(_disposables);
@@ -224,14 +224,14 @@ namespace Cass.Character
         private void AddHorizontalVelocityControl()
         {
             //TODO: бля, ну надо ограничитель 200% попозже накину, надеюсь))00000))))
-            Observable.EveryFixedUpdate().Subscribe(_ =>
+            Observable.EveryUpdate().Subscribe(_ =>
             {
                 if (!isActiveAndEnabled)
                 {
                     return;
                 }
 
-                _chController.Move(_velocityXZ);
+                _chController.Move(_velocityXZ * Time.deltaTime);
 
                 _velocityXZ = Vector3.zero;
 
@@ -239,20 +239,20 @@ namespace Cass.Character
         }
         private void AddVerticalVelocityControl()
         {
-            Observable.EveryFixedUpdate().Subscribe(_ => 
+            Observable.EveryUpdate().Subscribe(_ => 
             {
                 if(!isActiveAndEnabled)
                 {
                     return;
                 }
 
-                _chController.Move(_veloctityY);
+                _chController.Move(_veloctityY * Time.deltaTime);
 
             }).AddTo(_disposables);
         }
         private void AddGroundedControl()
         {
-            Observable.EveryFixedUpdate().Subscribe(_ =>
+            Observable.EveryUpdate().Subscribe(_ =>
             {
                 bool currentGrounded = _isGrounded;
 
@@ -274,7 +274,7 @@ namespace Cass.Character
         private void AddMovement()
         {
             //Movement
-            Observable.EveryFixedUpdate().Select(x => _inputActions.Main.Move.ReadValue<Vector2>()).Subscribe(moveInput =>
+            Observable.EveryUpdate().Select(x => _inputActions.Main.Move.ReadValue<Vector2>()).Subscribe(moveInput =>
             {
                 if (!isActiveAndEnabled)
                 {
@@ -303,7 +303,7 @@ namespace Cass.Character
 
                 float dashPower = _isUseDash ? _dashForce : 1;
 
-                _velocityXZ += _moveSpeed * Time.deltaTime * move * dashPower;
+                _velocityXZ += _moveSpeed * move * dashPower;
 
                 _rootChangeTransform.localRotation = Quaternion.Euler(_rootChangeTransform.localRotation.eulerAngles.x, Quaternion.LookRotation(move, _rootChangeTransform.forward).eulerAngles.y, _rootChangeTransform.localRotation.eulerAngles.z);
 
@@ -338,7 +338,7 @@ namespace Cass.Character
         }
         private void AddGravity()
         {
-            Observable.EveryFixedUpdate().Subscribe(_ =>
+            Observable.EveryUpdate().Subscribe(_ =>
             {
                 if (!isActiveAndEnabled || _isGrounded)
                 {
@@ -397,8 +397,7 @@ namespace Cass.Character
 
             }).AddTo(_disposables);
 
-        }
-       
+        }   
         private void AddJump()
         {
             if (_jumpEnable)
