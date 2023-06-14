@@ -29,6 +29,8 @@ namespace Cass.Character
 
         public ReactiveProperty<int> DashAvailableCount => _dashAvailable;
 
+        public PlayerInfo PlayerInfo => _playerInfo;
+
         [SerializeField]
         private Transform _targetTransform = default;
 
@@ -159,6 +161,8 @@ namespace Cass.Character
         private Vector3 _velocityXZ = default;
 
         private bool _isUseDash = false;
+
+        private PlayerInfo _playerInfo = default;
 
         #endregion
 

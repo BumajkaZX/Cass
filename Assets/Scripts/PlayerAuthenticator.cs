@@ -29,6 +29,7 @@ namespace Cass.Services
 
         public Task<Action> Initialization(CancellationToken token)
         {
+
 #if UNITY_ANDROID
 
             if (ConnectionManager.Instance.IsConnected.Value)

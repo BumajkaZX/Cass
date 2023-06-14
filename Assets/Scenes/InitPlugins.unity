@@ -539,10 +539,9 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   LoadScene: Loading
   MenuScene: Tutor
-  FirstTutorScene: Tutor
   LoadComplete:
     value: 0
   IsAvailableLoad:
     value: 1
   _serviceTimeout: 5
-  _needWaitFirstLoad: 1
+  _needWaitAction: 1

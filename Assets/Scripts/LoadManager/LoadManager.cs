@@ -1,7 +1,5 @@
 namespace Cass.LoadManager
 {
-    using System.Collections;
-    using System.Collections.Generic;
     using UnityEngine;
     using UnityEngine.SceneManagement;
     using NaughtyAttributes;
@@ -10,8 +8,10 @@ namespace Cass.LoadManager
     using System;
     using System.Threading;
     using System.Threading.Tasks;
-    using Cass.FirstEntry;
 
+    /// <summary>
+    /// Load manager with conditions
+    /// </summary>
     public class LoadManager : MonoBehaviour
     {
         /// <summary>
@@ -25,9 +25,9 @@ namespace Cass.LoadManager
         [Scene]
         public string MenuScene = default;
 
-        [Scene]
-        public string FirstTutorScene = default;
-
+        /// <summary>
+        /// On load complete
+        /// </summary>
         [HideInInspector]
         public ReactiveProperty<bool> LoadComplete = new ReactiveProperty<bool>();
 
@@ -38,7 +38,7 @@ namespace Cass.LoadManager
         private float _serviceTimeout = 5;
 
         [SerializeField]
-        private bool _needWaitFirstLoad = false;
+        private bool _needWaitAction = false;
 
         private event Action _onSceneStart = delegate { };
 
@@ -60,19 +60,14 @@ namespace Cass.LoadManager
             await InitScripts();
         }
 
-        private async void Start()
-        {
-            FirstEntry firstEntry = new FirstEntry();
+        private async void Start() => await LoadLevel(MenuScene, _needWaitAction);
 
-            if (firstEntry.IsFirstEntry())
-            {
-                await LoadLevel(FirstTutorScene, _needWaitFirstLoad);
-                return;
-            }
-
-            await LoadLevel(MenuScene, _needWaitFirstLoad);
-        }
-
+        /// <summary>
+        /// Set IsLoadAvailable true, if wait for action - true
+        /// </summary>
+        /// <param name="sceneName"></param>
+        /// <param name="waitForTouch"></param>
+        /// <returns></returns>
         public async Task LoadLevel(string sceneName, bool waitForTouch)
         {
             _onSceneStart = delegate { };
@@ -147,6 +142,10 @@ namespace Cass.LoadManager
             }
         }
 
+        /// <summary>
+        /// Doesn't reinit blocked conditions 
+        /// </summary>
+        /// <returns></returns>
         private async Task InitScripts()
         {
             var conditions = FindObjectsOfType<MonoBehaviour>(true).OfType<ILoadingCondition>();
