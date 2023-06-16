@@ -2,6 +2,7 @@ namespace Cass.Character
 {
     using UnityEngine;
     using UniRx;
+    using UniRx.Triggers;
     using System;
     using UnityEngine.Pool;
     using FMODUnity;
@@ -138,6 +139,12 @@ namespace Cass.Character
         [SerializeField]
         private StudioEventEmitter _landSound = default;
 
+        [Space(20)]
+
+        [SerializeField]
+        private Collider _trigger = default;
+        
+
         private ObjectPool<MultiParticlesPlayer> _dashPool = default;
 
         private ObjectPool<MultiParticlesPlayer> _landPool = default;
@@ -211,10 +218,45 @@ namespace Cass.Character
             AddJump();
             AddDash();
             AddShoot();
-
+            AddTriggerInteractable();
+           
 
             AddVerticalVelocityControl();
             AddHorizontalVelocityControl();
+        }
+
+        private void AddTriggerInteractable()
+        {
+            CompositeDisposable dis = new CompositeDisposable();
+
+
+            Action interactAction = default;
+
+            IInteractableObject interactable = default;
+
+            _trigger.OnTriggerEnterAsObservable().Subscribe(trigger => 
+            {
+                if (trigger.gameObject.TryGetComponent(out interactable))
+                {
+                    interactAction = interactable.OnObjectInteract;
+                    interactable.StartInteractionAnim(true);
+                    Observable.EveryUpdate().Where(_ => _inputActions.Main.Interact.WasPressedThisFrame()).Subscribe(_ => 
+                    {
+                        interactAction.Invoke();
+                        dis.Clear();
+                    }).AddTo(dis);
+                }
+            }).AddTo(_disposables);
+
+            _trigger.OnTriggerExitAsObservable().Subscribe(trigger => 
+            {
+                if(interactable != null)
+                {
+                    interactable.StartInteractionAnim(false);
+                }
+                interactAction = null;
+                dis.Clear();
+            }).AddTo(_disposables);
         }
 
         private void AddShoot()

@@ -2,6 +2,7 @@ namespace Cass.Character
 {
     using GooglePlayGames.BasicApi.SavedGame;
     using System;
+    using UnityEngine;
 
     [Serializable]
     public class PlayerInfo : ISavedGameMetadata
@@ -15,6 +16,10 @@ namespace Cass.Character
         public string LandParticlesId = default;
 
         public string ActiveGunId = default;
+
+        public string LastScene = default;
+
+        public Vector3 LastPos = default;
 
         public TimeSpan TotalTime = default;
 
