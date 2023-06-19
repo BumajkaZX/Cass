@@ -8,6 +8,8 @@ namespace Cass.LoadManager
     using System;
     using System.Threading;
     using System.Threading.Tasks;
+    using Cass.Services;
+    using Cass.Character;
 
     /// <summary>
     /// Load manager with conditions
@@ -21,9 +23,6 @@ namespace Cass.LoadManager
 
         [Scene]
         public string LoadScene = default;
-
-        [Scene]
-        public string MenuScene = default;
 
         /// <summary>
         /// On load complete
@@ -58,9 +57,24 @@ namespace Cass.LoadManager
             }
 
             await InitScripts();
+
+            
         }
 
-        private async void Start() => await LoadLevel(MenuScene, _needWaitAction);
+        private async void Start()
+        {
+            PlayerInfo info = default;
+            if (ConnectionManager.Instance.IsConnected.Value)
+            {
+                info = SaveManager.Instance.CloudPlayerInfo.Value;
+            }
+            else
+            {
+                info = SaveManager.Instance.OfflinePlayerInfo.Value;
+            }
+
+            await LoadLevel(info.LastScene, _needWaitAction);
+        }
 
         /// <summary>
         /// Set IsLoadAvailable true, if wait for action - true

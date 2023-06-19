@@ -13,7 +13,8 @@ Material:
   m_Parent: {fileID: 0}
   m_ModifiedSerializedProperties: 0
   m_ValidKeywords: []
-  m_InvalidKeywords: []
+  m_InvalidKeywords:
+  - _REQUIRE_DEPTH_TEXTURE
   m_LightmapFlags: 4
   m_EnableInstancingVariants: 0
   m_DoubleSidedGI: 0
@@ -39,8 +40,10 @@ Material:
     m_Ints: []
     m_Floats:
     - _ColorThreshold: 0.85
+    - _Color_Thickness: 1.05
     - _NormalThreshold: 0.66
     - _OVERLAY: 0
+    - _REQUIRE_DEPTH_TEXTURE: 1
     - _VertexColor: 0
     m_Colors:
     - _OutlineColor: {r: 1.4980394, g: 1.4980394, b: 1.4980394, a: 1}

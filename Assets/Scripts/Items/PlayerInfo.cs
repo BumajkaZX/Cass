@@ -1,5 +1,6 @@
 namespace Cass.Character
 {
+    using Cass.Items;
     using GooglePlayGames.BasicApi.SavedGame;
     using System;
     using UnityEngine;
@@ -7,17 +8,17 @@ namespace Cass.Character
     [Serializable]
     public class PlayerInfo : ISavedGameMetadata
     {
-        public string HatId = default;
+        public string HatId = "defaultHat";
 
-        public string GlassesId = default;
+        public string GlassesId = "defaultGlasses";
 
-        public string BodyId = default;
+        public string BodyId = "defaultBody";
 
-        public string LandParticlesId = default;
+        public string TailId = "defaultTail";
 
-        public string ActiveGunId = default;
+        public string ActiveGunId = "defaultGun";
 
-        public string LastScene = default;
+        public string LastScene = "Tutor";
 
         public Vector3 LastPos = default;
 
@@ -38,5 +39,26 @@ namespace Cass.Character
         public TimeSpan TotalTimePlayed => TotalTime;
 
         public DateTime LastModifiedTimestamp => LastModified;
+
+        public bool IsPutOn(string itemId) => itemId == HatId || itemId == GlassesId || itemId == BodyId || itemId == TailId || itemId == ActiveGunId;
+        public void SetOutfit(Outfit item)
+        {
+            switch (item.OutfitType)
+            {
+                case OutfitType.Hat:
+                    HatId = item.ItemId;
+                    break;
+                case OutfitType.Glasses:
+                    GlassesId = item.ItemId;
+                    break;
+                case OutfitType.Body:
+                    BodyId = item.ItemId;
+                    break;
+                case OutfitType.Tail:
+                    TailId = item.ItemId;
+                    break;
+            }
+        }
+        public void SetGun(string id) => ActiveGunId = id;
     }
 }

@@ -7,12 +7,12 @@
             "actions": [
                 {
                     "name": "Move",
-                    "type": "Value",
+                    "type": "PassThrough",
                     "id": "82fae5b5-1e45-45ab-b373-2710ff4f9dd0",
                     "expectedControlType": "Vector2",
                     "processors": "",
                     "interactions": "",
-                    "initialStateCheck": true
+                    "initialStateCheck": false
                 },
                 {
                     "name": "Jump",
@@ -123,7 +123,7 @@
                     "id": "3ac2db83-6b07-4a28-9640-d1c3bc67757a",
                     "path": "<AndroidJoystick>/stick",
                     "interactions": "",
-                    "processors": "",
+                    "processors": "StickDeadzone(min=0.3)",
                     "groups": "",
                     "action": "Move",
                     "isComposite": false,

@@ -38,15 +38,13 @@ namespace Cass.Services
 
 #if UNITY_EDITOR
 
-            IsConnected.Value = true;
+            IsConnected.Value = false;
 
 #else
       
             ConnectionObserver();
 
-#endif
-
-            while (!IsConnected.Value)
+               while (!IsConnected.Value)
             {
                 if (token.IsCancellationRequested)
                 {
@@ -54,6 +52,9 @@ namespace Cass.Services
                 }
                 await Task.Yield();
             }
+
+#endif
+
 
             _isInited = true;
 

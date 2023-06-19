@@ -160,7 +160,6 @@ namespace Cass.StoreManager
 
         public void OnPurchaseFailed(Product product, PurchaseFailureDescription failureDescription)
         {
-            throw new NotImplementedException();
         }
 
         public void Purchase(PlayerItem item) => _storeController.InitiatePurchase(_storeController.products.WithID(item.ItemId));

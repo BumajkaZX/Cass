@@ -8,6 +8,9 @@ namespace Cass.Character
     using FMODUnity;
     using Unity.Netcode;
     using Cass.VibrationManager;
+    using Cass.Services;
+    using Cass.Items;
+    using Cass.Interactable;
 
     /// <summary>
     /// Character Controller
@@ -31,6 +34,8 @@ namespace Cass.Character
         public ReactiveProperty<int> DashAvailableCount => _dashAvailable;
 
         public PlayerInfo PlayerInfo => _playerInfo;
+
+        public Transform TargetGroupTransform => _targetTransform;
 
         [SerializeField]
         private Transform _targetTransform = default;
@@ -143,7 +148,14 @@ namespace Cass.Character
 
         [SerializeField]
         private Collider _trigger = default;
-        
+
+        [Space(20)]
+
+        [SerializeField]
+        private OutfitController _outfitController = default;
+
+        [SerializeField]
+        private PlayerInfo _playerInfo = default;
 
         private ObjectPool<MultiParticlesPlayer> _dashPool = default;
 
@@ -169,8 +181,6 @@ namespace Cass.Character
 
         private bool _isUseDash = false;
 
-        private PlayerInfo _playerInfo = default;
-
         #endregion
 
         public override void OnNetworkSpawn()
@@ -186,9 +196,21 @@ namespace Cass.Character
             TargetTransform.SetValueAndForceNotify(_targetTransform);
         }
 
-        private void Awake()
+        private async void Awake()
         { 
             _chController = GetComponent<CharacterController>();
+
+            if (ConnectionManager.Instance.IsConnected.Value)
+            {
+                _playerInfo = SaveManager.Instance.CloudPlayerInfo.Value;
+            }
+            else 
+            {
+                _playerInfo = SaveManager.Instance.OfflinePlayerInfo.Value;
+                Debug.LogError(_playerInfo.HatId);
+            }
+
+            await _outfitController.BuildCharacter(_playerInfo);
 
             if (_dashEnable)
             {
@@ -229,7 +251,6 @@ namespace Cass.Character
         {
             CompositeDisposable dis = new CompositeDisposable();
 
-
             Action interactAction = default;
 
             IInteractableObject interactable = default;
@@ -238,11 +259,13 @@ namespace Cass.Character
             {
                 if (trigger.gameObject.TryGetComponent(out interactable))
                 {
+                   
                     interactAction = interactable.OnObjectInteract;
-                    interactable.StartInteractionAnim(true);
+                    interactable.StartInteraction(true);
                     Observable.EveryUpdate().Where(_ => _inputActions.Main.Interact.WasPressedThisFrame()).Subscribe(_ => 
                     {
                         interactAction.Invoke();
+                        Debug.LogError(_playerInfo.HatId);
                         dis.Clear();
                     }).AddTo(dis);
                 }
@@ -252,13 +275,12 @@ namespace Cass.Character
             {
                 if(interactable != null)
                 {
-                    interactable.StartInteractionAnim(false);
+                    interactable.StartInteraction(false);
                 }
                 interactAction = null;
                 dis.Clear();
             }).AddTo(_disposables);
         }
-
         private void AddShoot()
         {
             Observable.EveryUpdate().Where(_ => _inputActions.Main.Fire.IsPressed()).Subscribe(_ =>
@@ -266,7 +288,6 @@ namespace Cass.Character
                 VibrationManager.Vibrate(VibrationManager.VibrationPower.Medium, VibrationManager.VibrationType.Shot);
             }).AddTo(_disposables);
         }
-
         private void AddHorizontalVelocityControl()
         {
             //TODO: бля, ну надо ограничитель 200% попозже накину, надеюсь))00000))))
@@ -508,14 +529,16 @@ namespace Cass.Character
             {
                 if (enable)
                 {
-                    _inputActions.Enable();
+                    _inputActions.Main.Enable();
                 }
                 else
                 {
-                    _inputActions.Disable();
+                    _inputActions.Main.Disable();
                 }
             }
         }
+        public void RebuildOutfit(Outfit item, bool isActive, bool isPermanent) => _outfitController.RebuildCharacter(item, isActive, isPermanent);
+        public void LookAt(Transform lookAt) => _rootChangeTransform.LookAt(lookAt);
         public override void OnDestroy()
         {
             base.OnDestroy();

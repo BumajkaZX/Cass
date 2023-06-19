@@ -6,9 +6,6 @@ namespace Cass.Items.Guns
     public abstract class AbstractGun : PlayerItem
     {
         [SerializeField]
-        protected Transform _gunPrefab = default;
-
-        [SerializeField]
         protected Transform _bulletPrefab = default;
 
         [SerializeField, Min(0)]

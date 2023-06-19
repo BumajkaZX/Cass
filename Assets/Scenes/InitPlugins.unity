@@ -345,6 +345,11 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _items:
   - {fileID: 11400000, guid: 6c91d294a21226e4c91b159a253a301f, type: 2}
+  - {fileID: 11400000, guid: 9264da1e4b3145446a5a7a9bb8821779, type: 2}
+  - {fileID: 11400000, guid: 70b3f8049c152e242a3a72f34962e8c8, type: 2}
+  - {fileID: 11400000, guid: 78bf0ac385b5ffb4aa574bd83ff03879, type: 2}
+  - {fileID: 11400000, guid: 928ccaed8ac07d1469a71bdd17bd34f3, type: 2}
+  - {fileID: 11400000, guid: 0a5b044126adbc04a90b6c7920471926, type: 2}
 --- !u!4 &1215656762
 Transform:
   m_ObjectHideFlags: 0
@@ -389,6 +394,26 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 8b282bc7acda2de4eb82adf039e1547f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  CloudPlayerInfo:
+    value:
+      HatId: 
+      GlassesId: 
+      BodyId: 
+      TailId: 
+      ActiveGunId: 
+      LastScene: 
+      LastPos: {x: 0, y: 0, z: 0}
+      Progress: 0
+  OfflinePlayerInfo:
+    value:
+      HatId: 
+      GlassesId: 
+      BodyId: 
+      TailId: 
+      ActiveGunId: 
+      LastScene: 
+      LastPos: {x: 0, y: 0, z: 0}
+      Progress: 0
 --- !u!4 &1282562163
 Transform:
   m_ObjectHideFlags: 0
@@ -538,7 +563,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   LoadScene: Loading
-  MenuScene: Tutor
   LoadComplete:
     value: 0
   IsAvailableLoad:

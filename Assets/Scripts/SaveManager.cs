@@ -44,29 +44,33 @@ namespace Cass.Services
 
         private bool _isSaving = false;
 
-        public Task<Action> Initialization(CancellationToken token)
+        public async Task<Action> Initialization(CancellationToken token)
         { 
             Instance = this;
             DontDestroyOnLoad(gameObject);
 
             _savedGameClient = PlayGamesPlatform.Instance.SavedGame;
 
+            await SaveLoad(false);
 
             _isInited = true;
 
-            return Task.FromResult<Action>(null);
+            Action act = null;
+
+            return act;
         }
 
         /// <summary>
         /// true - save, false - load
         /// </summary>
         /// <param name="isSave"></param>
-        public void SaveLoad(bool isSave)
+        public async Task SaveLoad(bool isSave)
         {
+            Debug.LogError(isSave + " save");
             if(!PlayGamesPlatform.Instance.IsAuthenticated())
             {
                 _isSaving = isSave;
-                OfflineSaveLoad();
+                await OfflineSaveLoad();
                 return;
             }
 
@@ -94,6 +98,7 @@ namespace Cass.Services
 
         private void LoadCallback(SavedGameRequestStatus status, byte[] data)
         {
+            Debug.LogError(status);
             if(status == SavedGameRequestStatus.Success)
             {
                 CloudPlayerInfo.SetValueAndForceNotify(JsonUtility.FromJson<PlayerInfo>(data.ToString()));
@@ -113,20 +118,27 @@ namespace Cass.Services
 
             _savedGameClient.CommitUpdate(playerInfo, updateForMetadata, data, SaveCallback);
 
+            OfflineSave();
+
             return true;
         }
 
-        private void OfflineSaveLoad()
+        private async Task OfflineSaveLoad()
         {
             if (_isSaving)
             {
-                byte[] bytesToEncode = Encoding.UTF8.GetBytes(JsonUtility.ToJson(PlayersPool.Players.Find(_ => _.IsOwner).PlayerInfo.ToString()));
-                string encodedText = Convert.ToBase64String(bytesToEncode);
-                PlayerPrefs.SetString(SAVE_NAME, encodedText);
-                PlayerPrefs.Save();
+                OfflineSave();
             }
             else
             {
+                Debug.LogError("En");
+                if (!PlayerPrefs.HasKey(SAVE_NAME))
+                {
+                    PlayerInfo info = new PlayerInfo();
+                    OfflinePlayerInfo.SetValueAndForceNotify(info);
+                    return;
+                }
+                Debug.LogError("Norm load");
                 byte[] decodedBytes = Convert.FromBase64String(PlayerPrefs.GetString(SAVE_NAME));
                 string decodedText = Encoding.UTF8.GetString(decodedBytes);
 
@@ -134,6 +146,13 @@ namespace Cass.Services
             }
         }
 
+        private void OfflineSave()
+        {
+            byte[] bytesToEncode = Encoding.UTF8.GetBytes(JsonUtility.ToJson(PlayersPool.Players.Find(_ => _.IsOwner).PlayerInfo));
+            string encodedText = Convert.ToBase64String(bytesToEncode);
+            PlayerPrefs.SetString(SAVE_NAME, encodedText);
+            PlayerPrefs.Save();
+        }
         private void SaveCallback(SavedGameRequestStatus status, ISavedGameMetadata data)
         {
             if(status == SavedGameRequestStatus.Success)
@@ -145,5 +164,7 @@ namespace Cass.Services
                 Cass.Logger.Logger.Instance.Log("Save error");
             }
         }
+
+        private async void OnApplicationQuit() => await SaveLoad(true);
     }
 }

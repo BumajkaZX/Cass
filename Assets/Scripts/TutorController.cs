@@ -21,19 +21,10 @@ public class TutorController : MonoBehaviour, ILoadingCondition
     private CinemachineVirtualCamera _virtualCamera = default;
 
     [SerializeField]
-    private CinemachineVirtualCamera _firstEntryCamera = default;
-
-    [SerializeField]
     private Transform _playerSpawnPos = default;
 
     [SerializeField]
     private Transform _firstEntrySpawnPos = default;
-
-    [SerializeField]
-    private Transform _changeCharacterCanvas = default;
-
-    [SerializeField]
-    private Transform _inputCharacterCanvas = default;
 
     [SerializeField]
     private NetworkObject _playerNetworkObject = default;
@@ -58,8 +49,6 @@ public class TutorController : MonoBehaviour, ILoadingCondition
 
         MainCharacterController.TargetTransform.Where(_ => _ != null).Subscribe(target =>
         {
-                _firstEntryCamera.Follow = target;
-                _firstEntryCamera.LookAt = target;
                 _virtualCamera.Follow = target;
                 _virtualCamera.LookAt = target;
         }).AddTo(this);
@@ -84,28 +73,9 @@ public class TutorController : MonoBehaviour, ILoadingCondition
 
     private void FirstEntry()
     {
-        var playersPool = PlayersPool.Players;
-
-        foreach(MainCharacterController player in playersPool)
-        {
-            player.EnableInput(false);
-        }
-
-        _virtualCamera.gameObject.SetActive(false);
-
-        _firstEntryCamera.gameObject.SetActive(true);
-
-        _changeCharacterCanvas.gameObject.SetActive(true);
-        _inputCharacterCanvas.gameObject.SetActive(false);
     }
 
     private void TutorialStart()
     {
-        _virtualCamera.gameObject.SetActive(true);
-
-        _firstEntryCamera.gameObject.SetActive(false);
-
-        _changeCharacterCanvas.gameObject.SetActive(false);
-        _inputCharacterCanvas.gameObject.SetActive(true);
     }
 }

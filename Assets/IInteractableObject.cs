@@ -1,7 +1,9 @@
-
-public interface IInteractableObject 
+namespace Cass.Interactable
 {
-    public void OnObjectInteract();
+    public interface IInteractableObject
+    {
+        public void OnObjectInteract();
 
-    public void StartInteractionAnim(bool isStart);
+        public void StartInteraction(bool isStart);
+    }
 }
