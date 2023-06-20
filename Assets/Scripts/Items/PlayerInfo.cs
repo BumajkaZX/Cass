@@ -3,10 +3,11 @@ namespace Cass.Character
     using Cass.Items;
     using GooglePlayGames.BasicApi.SavedGame;
     using System;
+    using Unity.Netcode;
     using UnityEngine;
 
     [Serializable]
-    public class PlayerInfo : ISavedGameMetadata
+    public class PlayerInfo : INetworkSerializable, ISavedGameMetadata
     {
         public string HatId = "defaultHat";
 
@@ -16,7 +17,7 @@ namespace Cass.Character
 
         public string TailId = "defaultTail";
 
-        public string ActiveGunId = "defaultGun";
+        public string ActiveGunId = "defaultShotgun";
 
         public string LastScene = "Tutor";
 
@@ -60,5 +61,14 @@ namespace Cass.Character
             }
         }
         public void SetGun(string id) => ActiveGunId = id;
+
+        public void NetworkSerialize<T>(BufferSerializer<T> serializer) where T : IReaderWriter
+        {
+            serializer.SerializeValue(ref HatId);
+            serializer.SerializeValue(ref GlassesId);
+            serializer.SerializeValue(ref BodyId);
+            serializer.SerializeValue(ref TailId);
+            serializer.SerializeValue(ref ActiveGunId);
+        }
     }
 }

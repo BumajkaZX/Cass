@@ -43,14 +43,14 @@ public class TutorController : MonoBehaviour, ILoadingCondition
 
         FirstEntry firstEntry = new FirstEntry();
 
-        player.transform.position = firstEntry.IsFirstEntry() ? _firstEntrySpawnPos.position : _playerSpawnPos.position;
+        player.transform.position = _playerSpawnPos.position;
 
         _networkManager.StartHost();
 
         MainCharacterController.TargetTransform.Where(_ => _ != null).Subscribe(target =>
         {
-                _virtualCamera.Follow = target;
-                _virtualCamera.LookAt = target;
+            _virtualCamera.Follow = target;
+            _virtualCamera.LookAt = target;
         }).AddTo(this);
 
         return Task.FromResult<Action>(OnSceneStart);

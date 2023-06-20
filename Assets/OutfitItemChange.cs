@@ -4,19 +4,9 @@ namespace Cass.Interactable
     using UniRx;
     using Cass.Items;
     using Cass.Character;
-    using Cass.LoadManager;
-    using System.Threading.Tasks;
-    using System;
-    using System.Threading;
 
-    public class OutfitItemChange : MonoBehaviour, IInteractableObject, ILoadingCondition
+    public class OutfitItemChange : MonoBehaviour, IInteractableObject
     {
-        public int Order => 100;
-
-        public string Name => typeof(OutfitItemChange).Name + gameObject.GetInstanceID();
-
-        public bool IsInited => _isInited;
-
         [SerializeField]
         private Transform _animationTrans = default;
 
@@ -29,15 +19,10 @@ namespace Cass.Interactable
 
         private CompositeDisposable _dis = new CompositeDisposable();
 
-        private bool _isInited = false;
 
-        public Task<Action> Initialization(CancellationToken token)
+        private void Awake()
         {
             _defaultScale = _animationTrans.localScale;
-            _charController = PlayersPool.Players.Find(_ => _.IsOwner);
-            _isInited = true;
-
-            return Task.FromResult<Action>(null);
         }
 
         public void OnObjectInteract()
@@ -55,6 +40,7 @@ namespace Cass.Interactable
 
         public void StartInteraction(bool isStart)
         {
+            _charController = PlayersPool.Players.Find(_ => _.IsOwner);
             if (_charController.PlayerInfo.IsPutOn(_outfitItem.ItemId))
             {
                 _animationTrans.localScale = _defaultScale;

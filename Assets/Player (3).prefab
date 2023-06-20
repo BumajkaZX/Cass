@@ -71,8 +71,7 @@ GameObject:
   - component: {fileID: 7758533698998798534}
   - component: {fileID: 1254750260192184958}
   - component: {fileID: 7339028467533133294}
-  - component: {fileID: 290826753104552497}
-  - component: {fileID: 4338268729693128683}
+  - component: {fileID: 4942966339688616599}
   m_Layer: 6
   m_Name: Body
   m_TagString: Untagged
@@ -94,6 +93,7 @@ Transform:
   m_Children:
   - {fileID: 6199371720154439332}
   - {fileID: 6899262806279217926}
+  - {fileID: 5842559150834445080}
   m_Father: {fileID: 6249091350580360090}
   m_RootOrder: -1
   m_LocalEulerAnglesHint: {x: -0.01, y: 0, z: 0}
@@ -165,6 +165,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 82b475aa39144a247979207c443b824f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  _gunPosition: {fileID: 0}
 --- !u!114 &4025382086152724543
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -217,6 +218,26 @@ MonoBehaviour:
   _landSound: {fileID: 7339028467533133294}
   _trigger: {fileID: 2212902102583716243}
   _outfitController: {fileID: 5566552180454600212}
+  _gunController: {fileID: 1343199297430912586}
+  _playerInfo:
+    HatId: defaultHat
+    GlassesId: defaultGlasses
+    BodyId: defaultBody
+    TailId: defaultTail
+    ActiveGunId: defaultGun
+    LastScene: Tutor
+    LastPos: {x: 0, y: 0, z: 0}
+    Progress: 0
+  _networkPlayerInfo:
+    m_InternalValue:
+      HatId: defaultHat
+      GlassesId: defaultGlasses
+      BodyId: defaultBody
+      TailId: defaultTail
+      ActiveGunId: defaultShotgun
+      LastScene: Tutor
+      LastPos: {x: 0, y: 0, z: 0}
+      Progress: 0
 --- !u!114 &7758533698998798534
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -310,7 +331,7 @@ MonoBehaviour:
   OverrideAttenuation: 0
   OverrideMinDistance: 1
   OverrideMaxDistance: 20
---- !u!114 &290826753104552497
+--- !u!114 &4942966339688616599
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -325,33 +346,21 @@ MonoBehaviour:
   SyncPositionX: 1
   SyncPositionY: 1
   SyncPositionZ: 1
-  SyncRotAngleX: 1
-  SyncRotAngleY: 1
-  SyncRotAngleZ: 1
+  SyncRotAngleX: 0
+  SyncRotAngleY: 0
+  SyncRotAngleZ: 0
   SyncScaleX: 0
   SyncScaleY: 0
   SyncScaleZ: 0
   PositionThreshold: 0.001
   RotAngleThreshold: 0.01
   ScaleThreshold: 0.01
-  UseQuaternionSynchronization: 1
+  UseQuaternionSynchronization: 0
   UseQuaternionCompression: 0
   UseHalfFloatPrecision: 0
-  InLocalSpace: 1
+  InLocalSpace: 0
   Interpolate: 1
   SlerpPosition: 0
---- !u!114 &4338268729693128683
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1980494322214258350}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: e1c69afdc4568d247960bbb32d74302d, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
 --- !u!1 &3027508764627804034
 GameObject:
   m_ObjectHideFlags: 0
@@ -456,7 +465,7 @@ SphereCollider:
   m_ProvidesContacts: 1
   m_Enabled: 1
   serializedVersion: 3
-  m_Radius: 0.02
+  m_Radius: 0.4
   m_Center: {x: 0, y: 0, z: 0}
 --- !u!54 &8392369821383999382
 Rigidbody:
@@ -496,6 +505,7 @@ GameObject:
   - component: {fileID: 6899262806279217926}
   - component: {fileID: 5566552180454600212}
   - component: {fileID: 6664175700039760190}
+  - component: {fileID: 1468779410560900553}
   m_Layer: 6
   m_Name: OutfitController
   m_TagString: Untagged
@@ -557,6 +567,36 @@ Rigidbody:
   m_Interpolate: 0
   m_Constraints: 0
   m_CollisionDetection: 0
+--- !u!114 &1468779410560900553
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3416816481124876825}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: df2868252ab5c4d1da357e8f11f1b524, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  SyncPositionX: 0
+  SyncPositionY: 0
+  SyncPositionZ: 0
+  SyncRotAngleX: 1
+  SyncRotAngleY: 1
+  SyncRotAngleZ: 0
+  SyncScaleX: 0
+  SyncScaleY: 0
+  SyncScaleZ: 0
+  PositionThreshold: 0.001
+  RotAngleThreshold: 0.01
+  ScaleThreshold: 0.01
+  UseQuaternionSynchronization: 0
+  UseQuaternionCompression: 0
+  UseHalfFloatPrecision: 0
+  InLocalSpace: 0
+  Interpolate: 1
+  SlerpPosition: 0
 --- !u!1 &7806589089816068617
 GameObject:
   m_ObjectHideFlags: 0
@@ -775,3 +815,48 @@ ConfigurableJoint:
   m_EnablePreprocessing: 1
   m_MassScale: 1
   m_ConnectedMassScale: 1
+--- !u!1 &8728564812182482238
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 5842559150834445080}
+  - component: {fileID: 1343199297430912586}
+  m_Layer: 6
+  m_Name: GunController
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &5842559150834445080
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8728564812182482238}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 1
+  m_Children: []
+  m_Father: {fileID: 1816326046687723266}
+  m_RootOrder: -1
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1343199297430912586
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8728564812182482238}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 82b475aa39144a247979207c443b824f, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _gunPosition: {fileID: 0}

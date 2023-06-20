@@ -11,6 +11,7 @@ namespace Cass.Character
     using Cass.Services;
     using Cass.Items;
     using Cass.Interactable;
+    using Cass.Items.Guns;
 
     /// <summary>
     /// Character Controller
@@ -155,7 +156,13 @@ namespace Cass.Character
         private OutfitController _outfitController = default;
 
         [SerializeField]
+        private GunController _gunController = default;
+
+        [SerializeField]
         private PlayerInfo _playerInfo = default;
+
+        [SerializeField]
+        private NetworkVariable<PlayerInfo> _networkPlayerInfo = new NetworkVariable<PlayerInfo>(writePerm: NetworkVariableWritePermission.Owner);
 
         private ObjectPool<MultiParticlesPlayer> _dashPool = default;
 
@@ -187,10 +194,24 @@ namespace Cass.Character
         {
             PlayersPool.AddPlayer(this);
 
-            if (!IsOwner)
+            if (IsOwner)
             {
-                Destroy(this);
-                return;
+                
+                if (ConnectionManager.Instance.IsConnected.Value)
+                {
+                    _networkPlayerInfo.Value = SaveManager.Instance.CloudPlayerInfo.Value;
+                }
+                else
+                {
+                    var playerinfo = SaveManager.Instance.OfflinePlayerInfo.Value;
+                    _networkPlayerInfo.Value = playerinfo;
+                    _playerInfo = playerinfo;
+                    Debug.LogError(_networkPlayerInfo.Value.HatId);
+                }
+            }
+            else
+            {
+                _playerInfo = _networkPlayerInfo.Value;
             }
 
             TargetTransform.SetValueAndForceNotify(_targetTransform);
@@ -200,15 +221,7 @@ namespace Cass.Character
         { 
             _chController = GetComponent<CharacterController>();
 
-            if (ConnectionManager.Instance.IsConnected.Value)
-            {
-                _playerInfo = SaveManager.Instance.CloudPlayerInfo.Value;
-            }
-            else 
-            {
-                _playerInfo = SaveManager.Instance.OfflinePlayerInfo.Value;
-                Debug.LogError(_playerInfo.HatId);
-            }
+            //await _gunController.Init(_playerInfo.ActiveGunId);
 
             await _outfitController.BuildCharacter(_playerInfo);
 
@@ -235,16 +248,21 @@ namespace Cass.Character
 
             AddGroundedControl();
             AddGravity();
-            AddMovement();
             AddScaleControl();
-            AddJump();
+      
+       
             AddDash();
             AddShoot();
-            AddTriggerInteractable();
-           
+       
 
-            AddVerticalVelocityControl();
-            AddHorizontalVelocityControl();
+            if (IsOwner)
+            {
+                AddMovement();
+                AddJump();
+                AddTriggerInteractable();
+                AddVerticalVelocityControl();
+                AddHorizontalVelocityControl();
+            }
         }
 
         private void AddTriggerInteractable()
@@ -283,10 +301,29 @@ namespace Cass.Character
         }
         private void AddShoot()
         {
-            Observable.EveryUpdate().Where(_ => _inputActions.Main.Fire.IsPressed()).Subscribe(_ =>
+            if (!IsOwner)
             {
-                VibrationManager.Vibrate(VibrationManager.VibrationPower.Medium, VibrationManager.VibrationType.Shot);
+                return;
+            }
+            Observable.EveryUpdate().Where(_ => _inputActions.Main.Fire.IsPressed()).Subscribe(_ => 
+            {
+                RequestShootServerRpc();
+                Shoot();
             }).AddTo(_disposables);
+        }
+        [ServerRpc]
+        private void RequestShootServerRpc() => ShootClientRpc();
+        [ClientRpc]
+        private void ShootClientRpc()
+        {
+            if (!IsOwner)
+            {
+                Shoot();
+            }
+        }
+        private void Shoot()
+        {
+            VibrationManager.Vibrate(VibrationManager.VibrationPower.Medium, VibrationManager.VibrationType.Shot);
         }
         private void AddHorizontalVelocityControl()
         {
@@ -348,13 +385,13 @@ namespace Cass.Character
                     return;
                 }
 
-               Vector3 relativePosition = _springTransform.position - transform.position;
+                Vector3 relativePosition = _springTransform.position - transform.position;
 
-               float coef = _rotationCoefficient * SCALE_TO_LOCAL;
+                float coef = _rotationCoefficient * SCALE_TO_LOCAL;
 
-               Vector3 rotation = new Vector3(_rootChangeTransform.localRotation.eulerAngles.x, _rootChangeTransform.localRotation.eulerAngles.y, -relativePosition.z * coef);
+                Vector3 rotation = new Vector3(_rootChangeTransform.localRotation.eulerAngles.x, _rootChangeTransform.localRotation.eulerAngles.y, -relativePosition.z * coef);
 
-               _rootChangeTransform.localRotation = Quaternion.Lerp(_rootChangeTransform.localRotation, Quaternion.Euler(rotation), Time.deltaTime * _rotationRecoverySpeed);
+                _rootChangeTransform.localRotation = Quaternion.Lerp(_rootChangeTransform.localRotation, Quaternion.Euler(rotation), Time.deltaTime * _rotationRecoverySpeed);
 
                 if (moveInput == Vector2.zero)
                 {
@@ -544,11 +581,6 @@ namespace Cass.Character
             base.OnDestroy();
 
             PlayersPool.RemovePlayer(this);
-
-            if (!IsOwner)
-            {
-                return;
-            }
 
             _inputActions.Main.Disable();
 
