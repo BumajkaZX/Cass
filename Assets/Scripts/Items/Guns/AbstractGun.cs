@@ -5,23 +5,17 @@ namespace Cass.Items.Guns
 
     public abstract class AbstractGun : PlayerItem
     {
-        public Rigidbody BulletPrefab => _bulletPrefab;
-
-        public Transform GunSpawnPosition => _gunSpawnPos;
-
         public float ShootSpeed => _shootSpeed;
+
+        public float BulletSpeed => _bulletSpeed;
+
+        public float Recoil => _recoil;
 
         public int BulletsPerShoot => _bulletsPerShoot;
 
         public float Range => _range;
 
         public float Damage => _damage;
-
-        [SerializeField]
-        protected Rigidbody _bulletPrefab = default;
-
-        [SerializeField]
-        protected Transform _gunSpawnPos = default;
 
         [SerializeField, Min(0)]
         protected float _shootSpeed = default;
@@ -35,11 +29,20 @@ namespace Cass.Items.Guns
         [SerializeField, Min(0)]
         protected float _damage = default;
 
+        [SerializeField, Min(0)]
+        protected float _bulletSpeed = default;
+
+        [SerializeField, Min(0.01f)]
+        protected float _scatter = default;
+
+        [SerializeField, Min(0)]
+        protected float _recoil = default;
+
         /// <summary>
         /// Shoot
         /// </summary>
         /// <returns>bullet velocity/ies </returns>
-        public abstract List<Vector3> Shoot();
+        public abstract List<Vector3> Shoot(Vector3 forward);
 
     }
 }

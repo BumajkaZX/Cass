@@ -186,6 +186,8 @@ namespace Cass.Character
 
         private Vector3 _velocityXZ = default;
 
+        private Vector3 _recoilVelocity = default;
+
         private bool _isUseDash = false;
 
         #endregion
@@ -199,14 +201,15 @@ namespace Cass.Character
                 
                 if (ConnectionManager.Instance.IsConnected.Value)
                 {
-                    _networkPlayerInfo.Value = SaveManager.Instance.CloudPlayerInfo.Value;
+                    var playerinfo = SaveManager.Instance.CloudPlayerInfo.Value;
+                    _networkPlayerInfo.Value = playerinfo;
+                    _playerInfo = playerinfo;
                 }
                 else
                 {
                     var playerinfo = SaveManager.Instance.OfflinePlayerInfo.Value;
                     _networkPlayerInfo.Value = playerinfo;
                     _playerInfo = playerinfo;
-                    Debug.LogError(_networkPlayerInfo.Value.HatId);
                 }
             }
             else
@@ -217,13 +220,9 @@ namespace Cass.Character
             TargetTransform.SetValueAndForceNotify(_targetTransform);
         }
 
-        private async void Awake()
+        private void Awake()
         { 
             _chController = GetComponent<CharacterController>();
-
-            //await _gunController.Init(_playerInfo.ActiveGunId);
-
-            await _outfitController.BuildCharacter(_playerInfo);
 
             if (_dashEnable)
             {
@@ -237,7 +236,7 @@ namespace Cass.Character
                 CreateParticlesPool(ref _jumpPool, _jumpParticles, _jumpPoolCount);
             }
         }
-        private void Start()
+        private async void Start()
         {
             _defaultScale = _rootChangeTransform.localScale;
             _dashAvailable.Value = _dashCount;
@@ -245,24 +244,42 @@ namespace Cass.Character
             _inputActions = new MainCharacterInput();
             _inputActions.Main.Enable();
 
+            Debug.LogError(_playerInfo.ActiveGunId);
+
+            await _gunController.Init(_playerInfo.ActiveGunId);
+
+            await _outfitController.BuildCharacter(_playerInfo);
+
 
             AddGroundedControl();
             AddGravity();
             AddScaleControl();
-      
-       
-            AddDash();
-            AddShoot();
+         
+        
        
 
             if (IsOwner)
             {
                 AddMovement();
+                AddShoot();
+                AddDash();
                 AddJump();
                 AddTriggerInteractable();
+                AddRecoilControl();
                 AddVerticalVelocityControl();
                 AddHorizontalVelocityControl();
             }
+        }
+
+        private void AddRecoilControl()
+        {
+            Observable.EveryUpdate().Subscribe(_ => 
+            {
+                _velocityXZ -= _recoilVelocity;
+
+                _recoilVelocity *= 1 - Time.deltaTime * 5;
+
+            }).AddTo(_disposables);
         }
 
         private void AddTriggerInteractable()
@@ -277,7 +294,6 @@ namespace Cass.Character
             {
                 if (trigger.gameObject.TryGetComponent(out interactable))
                 {
-                   
                     interactAction = interactable.OnObjectInteract;
                     interactable.StartInteraction(true);
                     Observable.EveryUpdate().Where(_ => _inputActions.Main.Interact.WasPressedThisFrame()).Subscribe(_ => 
@@ -289,7 +305,7 @@ namespace Cass.Character
                 }
             }).AddTo(_disposables);
 
-            _trigger.OnTriggerExitAsObservable().Subscribe(trigger => 
+            _trigger.OnTriggerExitAsObservable().Subscribe(trigger =>
             {
                 if(interactable != null)
                 {
@@ -301,10 +317,6 @@ namespace Cass.Character
         }
         private void AddShoot()
         {
-            if (!IsOwner)
-            {
-                return;
-            }
             Observable.EveryUpdate().Where(_ => _inputActions.Main.Fire.IsPressed()).Subscribe(_ => 
             {
                 RequestShootServerRpc();
@@ -323,6 +335,7 @@ namespace Cass.Character
         }
         private void Shoot()
         {
+            _recoilVelocity += _rootChangeTransform.forward * _gunController.Shoot();
             VibrationManager.Vibrate(VibrationManager.VibrationPower.Medium, VibrationManager.VibrationType.Shot);
         }
         private void AddHorizontalVelocityControl()
@@ -472,8 +485,6 @@ namespace Cass.Character
             }
 
             CompositeDisposable rechargeTimer = new CompositeDisposable();
-
-           // InputSystem.onActionChange += OnDeviceChange;
 
             //Dash
             Observable.EveryUpdate().Where(_ => _inputActions.Main.Dash.WasPressedThisFrame() && _dashAvailable.Value > 0 && !_isUseDash).Select(moveInput => _inputActions.Main.Move.ReadValue<Vector2>()).Subscribe(moveInput =>

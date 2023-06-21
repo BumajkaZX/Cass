@@ -12,12 +12,15 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 323e38fb769d17242a4a0ba57caa5857, type: 3}
   m_Name: Default shotgun
   m_EditorClassIdentifier: 
-  IsBought: 0
+  IsBought: 1
   _id: defaultShotgun
-  _isFree: 0
-  _gunPrefab: {fileID: 0}
-  _bulletPrefab: {fileID: 0}
-  _shootSpeed: 0
-  _bulletPerShoot: 0
-  _range: 0
-  _damage: 0
+  _isFree: 1
+  _prefabTransform: {fileID: 4127431739449525488, guid: f90e9368cffa2e74f93c3dd53789bef3,
+    type: 3}
+  _shootSpeed: 1
+  _bulletsPerShoot: 5
+  _range: 3
+  _damage: 50
+  _bulletSpeed: 30
+  _scatter: 0.37
+  _recoil: 30

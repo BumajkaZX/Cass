@@ -61,7 +61,6 @@ namespace Cass.Character
             }
         }
         public void SetGun(string id) => ActiveGunId = id;
-
         public void NetworkSerialize<T>(BufferSerializer<T> serializer) where T : IReaderWriter
         {
             serializer.SerializeValue(ref HatId);
