@@ -7,7 +7,6 @@ namespace Cass.Character
     using UnityEngine.Pool;
     using FMODUnity;
     using Unity.Netcode;
-    using Cass.VibrationManager;
     using Cass.Services;
     using Cass.Items;
     using Cass.Interactable;
@@ -158,6 +157,9 @@ namespace Cass.Character
         [SerializeField]
         private GunController _gunController = default;
 
+        [SerializeField, Range(0.01f, 30f)]
+        private float _recoilRecoveryPower = 8f;
+
         [SerializeField]
         private PlayerInfo _playerInfo = default;
 
@@ -277,7 +279,7 @@ namespace Cass.Character
             {
                 _velocityXZ -= _recoilVelocity;
 
-                _recoilVelocity *= 1 - Time.deltaTime * 5;
+                _recoilVelocity *= 1 - Time.deltaTime * _recoilRecoveryPower;
 
             }).AddTo(_disposables);
         }
@@ -336,7 +338,6 @@ namespace Cass.Character
         private void Shoot()
         {
             _recoilVelocity += _rootChangeTransform.forward * _gunController.Shoot();
-            VibrationManager.Vibrate(VibrationManager.VibrationPower.Medium, VibrationManager.VibrationType.Shot);
         }
         private void AddHorizontalVelocityControl()
         {

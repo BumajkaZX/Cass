@@ -25,7 +25,8 @@ Material:
     type: 3}
   m_Parent: {fileID: 0}
   m_ModifiedSerializedProperties: 0
-  m_ValidKeywords: []
+  m_ValidKeywords:
+  - _USECOLOR
   m_InvalidKeywords: []
   m_LightmapFlags: 4
   m_EnableInstancingVariants: 0
@@ -107,7 +108,7 @@ Material:
     - _Cutoff: 0.5
     - _DetailAlbedoMapScale: 1
     - _DetailNormalMapScale: 1
-    - _DitherStrenght: 0
+    - _DitherStrenght: 1
     - _DitherStrenghtColor: 2
     - _DstBlend: 0
     - _DstBlendAlpha: 0
@@ -127,11 +128,12 @@ Material:
     - _SrcBlend: 1
     - _SrcBlendAlpha: 1
     - _Surface: 0
+    - _USECOLOR: 1
     - _WorkflowMode: 1
     - _ZWrite: 1
     m_Colors:
     - _BaseColor: {r: 1, g: 1, b: 1, a: 1}
-    - _Color: {r: 1, g: 1, b: 1, a: 1}
+    - _Color: {r: 1.4980394, g: 1.4980394, b: 1.4980394, a: 1}
     - _DefaultColor: {r: 3.9995818, g: 3.9995818, b: 3.9995818, a: 0.12941177}
     - _EmissionColor: {r: 0, g: 0, b: 0, a: 1}
     - _GlobalResolution: {r: 213, g: 120, b: 0, a: 0}

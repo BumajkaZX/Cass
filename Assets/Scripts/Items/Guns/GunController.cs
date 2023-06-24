@@ -5,6 +5,7 @@ namespace Cass.Items.Guns
     using System.Threading.Tasks;
     using UniRx;
     using System;
+    using Cass.VibrationManager;
 
     public class GunController : MonoBehaviour
     {
@@ -55,6 +56,8 @@ namespace Cass.Items.Guns
                 bullet.velocity = velocities[i];
                 ReturnParticle(bullet, _gun.Range / _gun.BulletSpeed);
             }
+
+            VibrationManager.Vibrate(VibrationManager.VibrationPower.Easy, VibrationManager.VibrationType.Shot);
 
             Observable.Timer(TimeSpan.FromSeconds(_gun.ShootSpeed)).Subscribe(_ => _disposable.Clear()).AddTo(_disposable);
 

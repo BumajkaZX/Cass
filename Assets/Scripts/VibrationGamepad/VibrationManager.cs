@@ -24,6 +24,7 @@ namespace Cass.VibrationManager
             _tokenSource = new CancellationTokenSource();
             Application.wantsToQuit += OnApplicationQuit;
             InputSystem.onActionChange += OnDeviceChange;
+            Vibration.Init();
             SetGamepadVibrationControl();
         }
 
@@ -194,7 +195,7 @@ namespace Cass.VibrationManager
             {
                 if (_tokenSource.IsCancellationRequested || Gamepad.current == null)
                 {
-                    break;
+                    return;
                 }
 
                 float div = Time.fixedDeltaTime * 10;

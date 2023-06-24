@@ -49,7 +49,11 @@ namespace Cass.Services
             Instance = this;
             DontDestroyOnLoad(gameObject);
 
+#if !DEVELOPMENT_BUILD
+
             _savedGameClient = PlayGamesPlatform.Instance.SavedGame;
+
+#endif
 
             await SaveLoad(false);
 
@@ -67,7 +71,15 @@ namespace Cass.Services
         public async Task SaveLoad(bool isSave)
         {
             Debug.LogError(isSave + " save");
-            if(!PlayGamesPlatform.Instance.IsAuthenticated())
+
+#if DEVELOPMENT_BUILD
+
+                 _isSaving = isSave;
+                await OfflineSaveLoad();
+                return;
+
+#endif
+            if (!PlayGamesPlatform.Instance.IsAuthenticated())
             {
                 _isSaving = isSave;
                 await OfflineSaveLoad();

@@ -36,7 +36,7 @@ namespace Cass.Services
             Instance = this;
             DontDestroyOnLoad(gameObject);
 
-#if UNITY_EDITOR
+#if UNITY_EDITOR || DEVELOPMENT_BUILD
 
             IsConnected.Value = false;
 

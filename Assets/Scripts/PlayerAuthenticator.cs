@@ -30,7 +30,7 @@ namespace Cass.Services
         public Task<Action> Initialization(CancellationToken token)
         {
 
-#if UNITY_ANDROID
+#if UNITY_ANDROID && !DEVELOPMENT_BUILD
 
             if (ConnectionManager.Instance.IsConnected.Value)
             {
@@ -49,7 +49,7 @@ namespace Cass.Services
             return Task.FromResult<Action>(null);
         }
 
-#if UNITY_ANDROID
+#if UNITY_ANDROID && !DEVELOPMENT_BUILD
         private void ProcessAuthentication(SignInStatus status)
         {
             if(status == SignInStatus.Success)

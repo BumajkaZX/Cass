@@ -73,7 +73,7 @@ namespace Cass.LoadManager
                 info = SaveManager.Instance.OfflinePlayerInfo.Value;
             }
 
-            await LoadLevel(info.LastScene, _needWaitAction);
+            await LoadLevel("Tutor", _needWaitAction);
         }
 
         /// <summary>
