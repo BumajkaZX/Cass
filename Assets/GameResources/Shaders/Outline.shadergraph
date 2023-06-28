@@ -1324,8 +1324,8 @@
         "m_Expanded": true,
         "m_Position": {
             "serializedVersion": "2",
-            "x": 1798.0,
-            "y": 1587.0,
+            "x": 1600.0,
+            "y": 1551.0,
             "width": 139.0,
             "height": 118.0
         }
@@ -1975,7 +1975,7 @@
     "m_Title": "Detect edges based on colors",
     "m_Position": {
         "x": -1488.0,
-        "y": 1764.000244140625
+        "y": 1462.0
     }
 }
 
@@ -2843,8 +2843,8 @@
         "m_Expanded": true,
         "m_Position": {
             "serializedVersion": "2",
-            "x": -760.0,
-            "y": 1816.0,
+            "x": -843.0,
+            "y": 1840.0,
             "width": 208.0,
             "height": 313.0
         }
@@ -3783,8 +3783,8 @@
     "m_ObjectId": "7dde27c33bc74c8a885bb4519db4116e",
     "m_Title": "Detect edges based on world-space normals",
     "m_Position": {
-        "x": -1488.0,
-        "y": 642.0
+        "x": -1488.0001220703125,
+        "y": 584.0
     }
 }
 
@@ -4288,10 +4288,10 @@
         "m_Expanded": true,
         "m_Position": {
             "serializedVersion": "2",
-            "x": -863.9999389648438,
-            "y": 642.0,
-            "width": 208.0,
-            "height": 312.99993896484377
+            "x": -865.0000610351563,
+            "y": 643.0,
+            "width": 208.00006103515626,
+            "height": 313.00006103515627
         }
     },
     "m_Slots": [

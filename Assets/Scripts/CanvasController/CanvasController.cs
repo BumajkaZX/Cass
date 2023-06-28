@@ -11,6 +11,8 @@ namespace Cass.CanvasController
     {
         public static CanvasController Instance = default;
 
+        public CanvasIdentificator CurrentWindow => _currentWindow;
+
         public int Order => 10;
 
         public string Name => typeof(CanvasController).Name;
@@ -22,6 +24,8 @@ namespace Cass.CanvasController
 
         [SerializeField]
         private CanvasIdentificator _defaultCanvas = default;
+
+        private CanvasIdentificator _currentWindow = default;
 
         private bool _isInited = false;
 
@@ -41,7 +45,7 @@ namespace Cass.CanvasController
 
         public void SetActiveCanvas(CanvasIdentificator identificator, bool isSolo)
         {
-            if (!isSolo)
+            if (isSolo)
             {
                 foreach (IdentificatorHolder holder in _identificators)
                 {
@@ -49,20 +53,28 @@ namespace Cass.CanvasController
                 }
             }
 
-            _identificators.Find(_ => _.Identificator.Id == identificator.Id).gameObject.SetActive(true);
+            var wHolder = _identificators.Find(_ => _.Identificator.Id == identificator.Id);
 
+            wHolder.gameObject.SetActive(true);
+
+            _currentWindow = wHolder.Identificator;
         }
 
         public void SetActiveCanvas(string id, bool isSolo)
         {
-            if (!isSolo)
+            if (isSolo)
             {
                 foreach (IdentificatorHolder holder in _identificators)
                 {
                     holder.gameObject.SetActive(false);
                 }
             }
-            _identificators.Find(_ => _.Identificator.Id == id).gameObject.SetActive(true);
+
+            var wHolder = _identificators.Find(_ => _.Identificator.Id == id);
+
+            wHolder.gameObject.SetActive(true);
+
+            _currentWindow = wHolder.Identificator;
         }
     }
 }

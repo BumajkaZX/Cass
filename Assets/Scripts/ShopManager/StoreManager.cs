@@ -11,7 +11,7 @@ namespace Cass.StoreManager
     {
         public static StoreManager Instance { get; private set; }
 
-        public int Order => 5;
+        public int Order => 2;
 
         public string Name => typeof(StoreManager).Name;
 

@@ -27,7 +27,7 @@ namespace Cass.StoreManager
 #else
                 .SetOption("Test", false);
 #endif
-
+            Debug.LogError("gaming init");
             await UnityServices.InitializeAsync(options);
 
             ResourceRequest operation = Resources.LoadAsync<TextAsset>("IAPProductCatalog");

@@ -21,6 +21,6 @@ MonoBehaviour:
   _bulletsPerShoot: 5
   _range: 5
   _damage: 50
-  _bulletSpeed: 15
+  _bulletSpeed: 20
   _scatter: 0.37
   _recoil: 20

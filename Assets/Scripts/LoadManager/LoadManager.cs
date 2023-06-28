@@ -10,6 +10,7 @@ namespace Cass.LoadManager
     using System.Threading.Tasks;
     using Cass.Services;
     using Cass.Character;
+    using Cass.ApplicationStart;
 
     /// <summary>
     /// Load manager with conditions
@@ -39,6 +40,9 @@ namespace Cass.LoadManager
         [SerializeField]
         private bool _needWaitAction = false;
 
+        [SerializeField]
+        private StartLogosController _logosController = default;
+
         private event Action _onSceneStart = delegate { };
 
         private CancellationTokenSource _tokenSource = new CancellationTokenSource();
@@ -58,11 +62,6 @@ namespace Cass.LoadManager
 
             await InitScripts();
 
-            
-        }
-
-        private async void Start()
-        {
             PlayerInfo info = default;
             if (ConnectionManager.Instance.IsConnected.Value)
             {
@@ -72,6 +71,8 @@ namespace Cass.LoadManager
             {
                 info = SaveManager.Instance.OfflinePlayerInfo.Value;
             }
+
+            await _logosController.Init();
 
             await LoadLevel("Tutor", _needWaitAction);
         }
@@ -162,7 +163,7 @@ namespace Cass.LoadManager
         /// <returns></returns>
         private async Task InitScripts()
         {
-            var conditions = FindObjectsOfType<MonoBehaviour>(true).OfType<ILoadingCondition>();
+            var conditions = FindObjectsOfType<MonoBehaviour>().OfType<ILoadingCondition>();
 
             var listconditions = conditions.OrderBy(condition => condition.Order).ToList();
 
@@ -192,14 +193,13 @@ namespace Cass.LoadManager
                         _onSceneStart += task.Result;
                     }
                 }
-                
+
+                await Task.Yield();
             }
         }
 
-        private void OnDestroy()
-        {
-            _tokenSource.Cancel();
-        }
+        private void OnDestroy() => _tokenSource.Cancel();
+        private void OnApplicationQuit() => OnDestroy();
 
     }
 }

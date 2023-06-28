@@ -10,6 +10,7 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 1fa0e3ccc8d07974aa1852833584e560, type: 3}
-  m_Name: OutfitShop
+  m_Name: Multiplayer
   m_EditorClassIdentifier: 
-  _id: OutfitShop
+  Id: Multiplayer
+  IsSolo: 1

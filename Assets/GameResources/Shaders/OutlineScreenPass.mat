@@ -25,6 +25,10 @@ Material:
   m_SavedProperties:
     serializedVersion: 3
     m_TexEnvs:
+    - _Texture2D:
+        m_Texture: {fileID: 2800000, guid: 9df2b3641cd5bb047ba63c15d36a6445, type: 3}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
     - unity_Lightmaps:
         m_Texture: {fileID: 0}
         m_Scale: {x: 1, y: 1}
@@ -43,7 +47,9 @@ Material:
     - _Color_Thickness: 1.05
     - _NormalThreshold: 0.66
     - _OVERLAY: 0
+    - _Power: 0.99
     - _REQUIRE_DEPTH_TEXTURE: 1
+    - _Tile: 3.26
     - _VertexColor: 0
     m_Colors:
     - _OutlineColor: {r: 1.4980394, g: 1.4980394, b: 1.4980394, a: 1}
