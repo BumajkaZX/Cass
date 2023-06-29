@@ -31,7 +31,7 @@ namespace Cass.UI.Lobbies
                 {
                     lobbyName = lobbyName.Substring(0, _maxSymbols);
                 }
-                _lobbyManager.TryCreateLobby(lobbyName, _isPrivate);
+                _lobbyManager.TryCreateLobby(lobbyName ,_isPrivate);
 
             }).AddTo(this);
         }

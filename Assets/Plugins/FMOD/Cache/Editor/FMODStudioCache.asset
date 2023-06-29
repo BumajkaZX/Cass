@@ -69,10 +69,10 @@ MonoBehaviour:
   Path: FMOD/CassSound/Build/Desktop/Master.bank
   Name: Master
   StudioPath: bank:/Master
-  lastModified: 638169858708815758
+  lastModified: 638236593299543755
   FileSizes:
   - Name: Desktop
-    Value: 3880512
+    Value: 3889344
   Exists: 1
 --- !u!114 &11400000
 MonoBehaviour:
@@ -93,12 +93,13 @@ MonoBehaviour:
   - {fileID: -5876778693538378793}
   - {fileID: 7831422257792254857}
   - {fileID: -6878186166764026771}
+  - {fileID: 4686731860530341854}
   EditorParameters: []
   MasterBanks:
   - {fileID: -5140491757515388881}
   StringsBanks:
   - {fileID: 1458443303584126274}
-  cacheTime: 638169858708845788
+  cacheTime: 638236593299553766
   cacheVersion: 131605
 --- !u!114 &1458443303584126274
 MonoBehaviour:
@@ -115,11 +116,38 @@ MonoBehaviour:
   Path: FMOD/CassSound/Build/Desktop/Master.strings.bank
   Name: Master.strings
   StudioPath: bank:/Master.strings
-  lastModified: 638169858708845788
+  lastModified: 638236593299553766
   FileSizes:
   - Name: Desktop
-    Value: 846
+    Value: 888
   Exists: 1
+--- !u!114 &4686731860530341854
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ceb653cd98e289a4e8697a1af55201f2, type: 3}
+  m_Name: event:/Character/ShotgunShot
+  m_EditorClassIdentifier: 
+  Path: event:/Character/ShotgunShot
+  Guid:
+    Data1: -18244560
+    Data2: 1180677112
+    Data3: 471688373
+    Data4: -453219562
+  Banks:
+  - {fileID: -5140491757515388881}
+  IsStream: 0
+  Is3D: 0
+  IsOneShot: 1
+  Parameters: []
+  MinDistance: 1
+  MaxDistance: 20
+  Length: 461
 --- !u!114 &7831422257792254857
 MonoBehaviour:
   m_ObjectHideFlags: 0

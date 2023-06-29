@@ -6,21 +6,26 @@ namespace Cass.Items.Guns
     using UniRx;
     using System;
     using Cass.VibrationManager;
+    using FMODUnity;
 
     public class GunController : MonoBehaviour
     {
+        private const float PARTICLE_TIME = 0.4f;
+
         [SerializeField]
         private Transform _shootPosition = default;
 
         private Transform _gunTransform = default;
 
+        private StudioEventEmitter _shotPlayer = default;
+
         private AbstractGun _gun = default;
 
-        private ObjectPool<Rigidbody> _bulletsPool = default;
+        private ObjectPool<BulletLifetimeController> _bulletsPool = default;
 
         private CompositeDisposable _disposable = new CompositeDisposable();
 
-        public Task Init(string gunId)
+        public Task Init(string gunId, StudioEventEmitter shotPlayer)
         {
             if(_gunTransform != null)
             {
@@ -32,6 +37,9 @@ namespace Cass.Items.Guns
             {
                 _bulletsPool.Clear();
             }
+
+            _shotPlayer = shotPlayer;
+
             CreateBulletPool();
             _disposable.Clear();
 
@@ -53,9 +61,13 @@ namespace Cass.Items.Guns
             for (int i = 0; i < _gun.BulletsPerShoot; i++)
             {
                 var bullet = _bulletsPool.Get();
-                bullet.velocity = velocities[i];
-                ReturnParticle(bullet, _gun.Range / _gun.BulletSpeed);
+                bullet.Shoot(velocities[i], _gun.Range / _gun.BulletSpeed);
+                ReturnParticle(bullet, (_gun.Range / _gun.BulletSpeed) + PARTICLE_TIME);
             }
+
+            _shotPlayer.EventReference = _gun.ShotSound[UnityEngine.Random.Range(0, _gun.ShotSound.Length)];
+
+            _shotPlayer.Play();
 
             VibrationManager.Vibrate(VibrationManager.VibrationPower.Easy, VibrationManager.VibrationType.Shot);
 
@@ -64,7 +76,7 @@ namespace Cass.Items.Guns
             return _gun.Recoil;
         }
 
-        private void ReturnParticle(Rigidbody bullet, float returnTime)
+        private void ReturnParticle(BulletLifetimeController bullet, float returnTime)
         {
             CompositeDisposable disParticles = new CompositeDisposable();
             Observable.Timer(TimeSpan.FromSeconds(returnTime)).Subscribe(_ =>
@@ -80,17 +92,18 @@ namespace Cass.Items.Guns
         }
         private void CreateBulletPool() =>
             _bulletsPool = 
-            new ObjectPool<Rigidbody>(() => 
+            new ObjectPool<BulletLifetimeController>(() => 
             {
-               return Instantiate(_gun.PrefabTransform).GetComponent<Rigidbody>();
+               var bullet = Instantiate(_gun.PrefabTransform).GetComponent<BulletLifetimeController>();
+                bullet.Init();
+                return bullet;
             },
                 bullet => 
                 {
                     bullet.transform.position = _shootPosition.position;
-                    bullet.velocity = Vector3.zero;
                     bullet.gameObject.SetActive(true);
                 },
-                bullet => bullet.gameObject.SetActive(false),
+                bullet => bullet.Stop(),
                 null,
                 false,
                 _gun.BulletsPerShoot * 10);

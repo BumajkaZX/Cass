@@ -2,6 +2,7 @@ namespace Cass.Items.Guns
 {
     using UnityEngine;
     using System.Collections.Generic;
+    using FMODUnity;
 
     public abstract class AbstractGun : PlayerItem
     {
@@ -16,6 +17,8 @@ namespace Cass.Items.Guns
         public float Range => _range;
 
         public float Damage => _damage;
+
+        public EventReference[] ShotSound => _shotSound;
 
         [SerializeField, Min(0)]
         protected float _shootSpeed = default;
@@ -37,6 +40,9 @@ namespace Cass.Items.Guns
 
         [SerializeField, Min(0)]
         protected float _recoil = default;
+
+        [SerializeField]
+        protected EventReference[] _shotSound = default;
 
         /// <summary>
         /// Shoot

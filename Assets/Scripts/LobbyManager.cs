@@ -40,7 +40,7 @@ public class LobbyManager : MonoBehaviour
 
     private CompositeDisposable _dis = new CompositeDisposable();
 
-    private void Awake() => _unityTransport = GetComponentInParent<UnityTransport>();
+    private void Awake() => _unityTransport = FindObjectOfType<UnityTransport>();
 
     private async void Start()
     {
@@ -166,8 +166,6 @@ public class LobbyManager : MonoBehaviour
             Observable.Timer(TimeSpan.FromSeconds(15)).Repeat().Subscribe(_ => Lobbies.Instance.SendHeartbeatPingAsync(_lobbyKey)).AddTo(this);
 
             _unityTransport.SetHostRelayData(allocation.RelayServer.IpV4, (ushort)allocation.RelayServer.Port, allocation.AllocationIdBytes, allocation.Key, allocation.ConnectionData);
-
-            NetworkManager.Singleton.StartHost();
 
             ConnectedLobby.Value = lobby;
 

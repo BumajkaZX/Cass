@@ -11,6 +11,7 @@ namespace Cass.Character
     using Cass.Items;
     using Cass.Interactable;
     using Cass.Items.Guns;
+    using Cinemachine;
 
     /// <summary>
     /// Character Controller
@@ -115,6 +116,9 @@ namespace Cass.Character
         [SerializeField, Range(1, 4)]
         private float _dashForce = 1f;
 
+        [SerializeField, Range(0, 1)]
+        private float _dashLookahead = 0.05f;
+
         [SerializeField]
         private int _dashPoolCount = default;
 
@@ -157,6 +161,9 @@ namespace Cass.Character
         [SerializeField]
         private GunController _gunController = default;
 
+        [SerializeField]
+        private StudioEventEmitter _shotPlayer = default;
+
         [SerializeField, Range(0.01f, 30f)]
         private float _recoilRecoveryPower = 8f;
 
@@ -175,6 +182,8 @@ namespace Cass.Character
         private CharacterController _chController = default;
 
         private MainCharacterInput _inputActions = default;
+
+        private CinemachineComposer _virtualComposer = default;
 
         private Vector3 _defaultScale = default;
 
@@ -226,6 +235,8 @@ namespace Cass.Character
         { 
             _chController = GetComponent<CharacterController>();
 
+            _virtualComposer = FindObjectOfType<Cinemachine.CinemachineVirtualCamera>().GetCinemachineComponent<CinemachineComposer>();
+
             if (_dashEnable)
             {
                 CreateParticlesPool(ref _dashPool, _dashParticles, _dashPoolCount);
@@ -248,7 +259,7 @@ namespace Cass.Character
 
             Debug.LogError(_playerInfo.ActiveGunId);
 
-            await _gunController.Init(_playerInfo.ActiveGunId);
+            await _gunController.Init(_playerInfo.ActiveGunId, _shotPlayer);
 
             await _outfitController.BuildCharacter(_playerInfo);
 
@@ -495,6 +506,8 @@ namespace Cass.Character
                     return;
                 }
 
+                _virtualComposer.m_LookaheadTime = _dashLookahead;
+
                 //Set particle rotation
                 _dashPool.Get(out MultiParticlesPlayer particle);
                 var lookPos = new Vector3(transform.position.x - moveInput.y, transform.position.y, transform.position.z + moveInput.x);
@@ -508,6 +521,7 @@ namespace Cass.Character
                 Observable.Timer(TimeSpan.FromSeconds(_dashSeconds)).Subscribe(_ =>
                 {
                     _isUseDash = false;
+                    _virtualComposer.m_LookaheadTime = 0;
                     rechargeTimer.Clear();
                 }).AddTo(rechargeTimer);
 

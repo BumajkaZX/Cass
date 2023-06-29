@@ -15,12 +15,19 @@ MonoBehaviour:
   IsBought: 1
   _id: defaultShotgun
   _isFree: 1
-  _prefabTransform: {fileID: 4127431739449525488, guid: f90e9368cffa2e74f93c3dd53789bef3,
+  _prefabTransform: {fileID: 1941805716189978023, guid: f90e9368cffa2e74f93c3dd53789bef3,
     type: 3}
   _shootSpeed: 1
   _bulletsPerShoot: 5
   _range: 5
   _damage: 50
   _bulletSpeed: 20
-  _scatter: 0.37
+  _scatter: 0.35
   _recoil: 20
+  _shotSound:
+  - Guid:
+      Data1: -18244560
+      Data2: 1180677112
+      Data3: 471688373
+      Data4: -453219562
+    Path: event:/Character/ShotgunShot
