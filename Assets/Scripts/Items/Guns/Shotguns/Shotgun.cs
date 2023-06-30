@@ -10,6 +10,7 @@ namespace Cass.Items.Guns
         {
             List<Vector3> velocities = new List<Vector3>(_bulletsPerShoot);
 
+            //Todo: static pattern 
             for (int i = 0; i < _bulletsPerShoot; i++)
             {
                 velocities.Add(new Vector3(forward.x + Random.Range(-_scatter, _scatter), 0, forward.z + Random.Range(-_scatter, _scatter)) * _bulletSpeed );

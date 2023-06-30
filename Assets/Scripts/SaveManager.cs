@@ -177,6 +177,16 @@ namespace Cass.Services
             }
         }
 
-        private async void OnApplicationQuit() => await SaveLoad(true);
+        private void OnApplicationPause(bool pause)
+        {
+            if (!pause)
+            {
+                return;
+            }
+            SaveLoad(true);
+        }
+
+        private void OnApplicationQuit() => SaveLoad(true);
+
     }
 }
